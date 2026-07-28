@@ -102,7 +102,10 @@
 
   .yourturn { background:var(--grass-soft); border:2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius:16px; padding:16px 18px; display:flex; gap:14px; align-items:center; }
   .yourturn .txt { flex:1; } .yourturn .txt p { margin:0; color:var(--ink); font-weight:600; font-size:.98rem; }
-  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:2px; }
+  .yourturn .txt ol { margin:2px 0 0; padding-left:22px; }
+  .yourturn .txt li { margin-bottom:5px; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt .after { margin:6px 0 0; color:var(--grass); font-weight:800; font-size:.95rem; }
+  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:4px; }
   .didit { flex:none; border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:.95rem; color:#fff; background:var(--grass); padding:12px 18px; border-radius:999px; box-shadow:0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition:transform .1s, background .2s; white-space:nowrap; }
   .didit:hover { transform:translateY(-2px); } .didit:active { transform:translateY(2px); }
   .didit.done { background:var(--ink-faint); box-shadow:0 4px 0 rgba(0,0,0,.2); cursor:default; }
@@ -192,15 +195,15 @@
     </svg>
     <div>
       <h3>Karibu back, Builder! 🐦</h3>
-      <p>Yesterday you built a world. But Fundi has a secret: your blocks are <b>asleep</b>. They just sit there. Today we whisper instructions to one block and it WAKES UP. Code is not scary. It is just a list of instructions, like a recipe for chapati or telling a friend the way to your house. <span class="say">Kidogo kidogo.</span></p>
+      <p>Yesterday you built a world. But Fundi has a secret: your blocks are <b>asleep</b>. They just sit there. Today you give one block some rules, and it wakes up. Code is not scary. Code is just a list of steps you write for the computer. Like a recipe for chapati. Or telling a friend the way to your house. <span class="say">Kidogo kidogo.</span></p>
     </div>
   </div>
 
   <!-- STEP 1 -->
   <section class="card step">
     <div class="step-num"><span class="n">1</span><span class="lab">Meet the Script</span></div>
-    <h2>The Script: your instruction note</h2>
-    <p>A <b>Script</b> is where code lives. Think of a note you tuck into someone's pocket: whoever holds the note follows it. In Roblox you tuck the note <b>inside</b> a thing, and that thing follows it. Things can hold other things inside them, like a school bag holds books.</p>
+    <h2>The Script: where your code lives</h2>
+    <p>A <b>Script</b> is where you write code. Think of a note you put in someone's pocket. The person with the note follows it. In Roblox you put the note <b>inside</b> a block. Then that block follows it. Things in Roblox can hold other things inside them, like a bag holds books.</p>
     <div class="stage">
       <div class="treecmp">
         <div class="treebox good">
@@ -218,7 +221,16 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Place a fresh Part. In the Explorer, hover it, click the <b>+</b>, and choose <b>Script</b>. Check that the Script sits INSIDE your Part, like a chick under Mama Hen.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Make a new Part.</li>
+          <li>In the Explorer, put your mouse on the Part.</li>
+          <li>Click the <b>+</b> sign.</li>
+          <li>Choose <b>Script</b>.</li>
+          <li>Check the Script sits <b>inside</b> the Part.</li>
+        </ol>
+        <p class="after">Like a chick under Mama Hen. 🐤</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -227,11 +239,19 @@
   <section class="card step">
     <div class="step-num"><span class="n">2</span><span class="lab">Say hello</span></div>
     <h2>Make the computer talk to you</h2>
-    <p>When your Script opens, delete everything so it is clean. Then type this exactly:</p>
+    <p>When your Script opens, delete everything in it first. Then type this, exactly like this:</p>
     <div class="code"><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="fn">print</span>(<span class="str">"hello"</span>)</pre></div>
-    <p><b>print</b> does not use a printer! It makes the computer write a message in a window called the <b>Output</b> (open it from the View tab). It is how the computer talks back to you, like watching for the reply ticks on a text.</p>
+    <p><b>print</b> does not use a printer! It makes the computer write a message in a window called the <b>Output</b>. Open it from the View tab. This is how the computer talks back to you.</p>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Type it, press Play, and watch the Output. Did "hello" appear? Now change "hello" to your own name and play again. You just commanded a computer!</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Type <span class="mono">print("hello")</span>.</li>
+          <li>Press <b>Play</b>.</li>
+          <li>Look at the Output window. Do you see "hello"?</li>
+          <li>Now change "hello" to your name. Play again.</li>
+        </ol>
+        <p class="after">You just told a computer what to do! 🎉</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
@@ -257,7 +277,13 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>No typing! Say three "when... do..." rules from real life out loud. Then invent one for a game: "When the player touches the block, ______."</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>No typing now!</li>
+          <li>Say three "when... do..." rules from real life. (Like: when the matatu hoots, we hurry.)</li>
+          <li>Now make one for a game: "When the player touches the block, ______."</li>
+        </ol>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -271,7 +297,12 @@
     <p>Read it like a sentence: "<b>script</b> is me, this note. <b>Parent</b> is the thing I am tucked inside, my Part. Let us call it <b>part</b> so it is easy to talk about."</p>
     <p class="typehint">Careful: capital <b>P</b> in <span class="mono">Parent</span>! The computer thinks <span class="mono">parent</span> and <span class="mono">Parent</span> are two different words, like Simba the lion and simba the neighbour's cat.</p>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Type that one line yourself, letter by letter. Take your time with the capital P.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Type this one line yourself.</li>
+          <li>Go slow. Get the capital <b>P</b> right.</li>
+        </ol>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -286,7 +317,13 @@
 <span class="kw">end</span></pre></div>
     <p>The middle line means "part, change your Color to red." <span class="mono">Color3.fromRGB(255, 0, 0)</span> is a recipe for a colour: 255 red, 0 green, 0 blue = pure RED. The <b>end</b> is the lid that closes the box.</p>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Type all three lines. Then say out loud what is inside your onTouch tin. (Answer: one step, paint the part red.)</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Type all three lines.</li>
+          <li>Say out loud what is inside the onTouch box.</li>
+        </ol>
+        <p class="after">Answer: one step, paint the block red.</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
@@ -312,7 +349,13 @@
 
 part.Touched:<span class="fn">Connect</span>(onTouch)</pre></div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Add the last line. Then read all 5 lines out loud like a story: "My block is called part. Here is a box called onTouch that turns it red. When part is touched, do onTouch."</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Add the last line.</li>
+          <li>Read all 5 lines out loud, like a story.</li>
+        </ol>
+        <p class="after">"My block is called part. Here is a box called onTouch that turns it red. When part is touched, do onTouch."</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
@@ -335,7 +378,15 @@ part.Touched:<span class="fn">Connect</span>(onTouch)</pre></div>
     </div>
     <style>@keyframes runacross { 0%{left:4%;} 55%{left:64%;} 100%{left:4%;} }</style>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Play and touch it. Then change the colour recipe: try <span class="mono">(0, 255, 0)</span> for green or <span class="mono">(255, 0, 255)</span> for pink-purple. Play again after each change. You are editing code now!</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Play</b>. Walk into your block.</li>
+          <li>Did it turn red? 🟥</li>
+          <li>Press <b>Stop</b>. Change the colour numbers. Try <span class="mono">(0, 255, 0)</span> for green.</li>
+          <li>Play again and see the new colour.</li>
+        </ol>
+        <p class="after">You are changing code now, like a real coder!</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <details class="trouble">
@@ -417,7 +468,7 @@ part.Touched:<span class="fn">Connect</span>(onTouch)</pre></div>
       badge.textContent = '⚡';
       celebTitle.textContent = 'YOU DID IT! Day 2 Coder Badge earned 🎉';
       celebText.className = '';
-      celebText.textContent = 'This morning you had never written code. Right now a computer is running instructions YOU wrote, in a real language called Luau, the same one the biggest Roblox games use. A script, the Output, the "when X do Y" superpower, a function, and an event wired together. One awakened block, one brand-new coder. See you on Day 3!';
+      celebText.textContent = 'This morning you had never written code. Now a computer is following the code YOU wrote! It is a real coding language called Luau. The big Roblox games use it too. You made a script, used the Output, learned "when X, do Y", made a function, and joined it to an event. One block woke up. You are a coder now. See you on Day 3!';
       var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
       if (animate){ celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); if (!reduce) confettiBurst(); }
     }

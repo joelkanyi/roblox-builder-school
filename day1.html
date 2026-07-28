@@ -155,8 +155,14 @@
   /* your turn */
   .yourturn { background: var(--grass-soft); border: 2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius: 16px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; }
   .yourturn .txt { flex: 1; }
-  .yourturn .kick { font-weight: 900; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: var(--grass); display: block; margin-bottom: 2px; }
+  .yourturn .kick { font-weight: 900; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: var(--grass); display: block; margin-bottom: 4px; }
   .yourturn .txt p { margin: 0; color: var(--ink); font-weight: 600; font-size: .98rem; }
+  .yourturn .txt ol { margin: 2px 0 0; padding-left: 22px; }
+  .yourturn .txt li { margin-bottom: 5px; color: var(--ink); font-weight: 600; font-size: .98rem; }
+  .yourturn .txt .after { margin: 6px 0 0; color: var(--grass); font-weight: 800; font-size: .95rem; }
+  .keycapmini { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px; background: var(--sun-soft); border: 1.5px solid var(--sun); font-weight: 900; font-size: 13px; font-family: ui-monospace, monospace; color: #6b5200; vertical-align: middle; }
+  @media (prefers-color-scheme: dark){ .keycapmini { color: var(--sun); } }
+  :root[data-theme="dark"] .keycapmini { color: var(--sun); }
   .didit { flex: none; border: none; cursor: pointer; font-family: inherit; font-weight: 900; font-size: .95rem; color: #fff; background: var(--grass); padding: 12px 18px; border-radius: 999px; box-shadow: 0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition: transform .1s, background .2s; white-space: nowrap; }
   .didit:hover { transform: translateY(-2px); }
   .didit:active { transform: translateY(2px); box-shadow: 0 1px 0 color-mix(in srgb, var(--grass) 55%, #000); }
@@ -223,7 +229,7 @@
     <div class="hero-scene" id="heroScene" aria-hidden="true"></div>
     <div class="eyebrow">Roblox Builder School</div>
     <h1>You Are Now a <span class="pop">World Builder</span></h1>
-    <p class="hook">Today you stop just playing Roblox. Today you build a world you can walk around inside.</p>
+    <p class="hook">Today you make your own Roblox world. Then you walk around inside it.</p>
   </div>
 </header>
 
@@ -243,15 +249,15 @@
     </svg>
     <div>
       <h3>Meet Fundi, your building buddy 🐦</h3>
-      <p>Fundi is a weaver bird. Weaver birds build those amazing round nests you see hanging in acacia trees, one blade of grass at a time. Nobody teaches them from a book. They just start. That is exactly how you will build games. <span class="say">"Kidogo kidogo... one block at a time."</span></p>
+      <p>Fundi is a weaver bird. Weaver birds make the round nests you see in trees. They build them one small piece of grass at a time. No one teaches them from a book. They just start. You will build games the same way. <span class="say">Kidogo kidogo, one block at a time.</span></p>
     </div>
   </div>
 
   <!-- STEP 1 -->
   <section class="card step">
     <div class="step-num"><span class="n">1</span><span class="lab">Open the workshop</span></div>
-    <h2>Open the magic workshop</h2>
-    <p>Normal Roblox is like watching a football match at the stadium. Roblox <b>Studio</b> is like being the person who built the stadium. Same game, but now you are on the builder's side. When it opens, click <b>Baseplate</b>. That is just a big empty piece of flat ground, like a plot of land before anyone builds on it.</p>
+    <h2>Open the workshop</h2>
+    <p>Normal Roblox is for <b>playing</b> games. Roblox <b>Studio</b> is for <b>making</b> games. It is a different app. Open it. Then click <b>Baseplate</b>. That gives you a big empty floor. It is your land. You will build on it.</p>
     <div class="stage">
       <div style="display:flex; gap:26px; align-items:center; font-weight:800; text-align:center;">
         <div><div style="font-size:44px;">🎮</div><div style="font-size:.8rem; color:var(--ink-faint);">PLAY the games</div></div>
@@ -260,7 +266,13 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Open Roblox Studio and click "Baseplate". That is it. You are officially inside the workshop.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Open Roblox Studio.</li>
+          <li>Click the word <b>Baseplate</b>.</li>
+        </ol>
+        <p class="after">That is it! You are inside the workshop. 🛠️</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -268,8 +280,8 @@
   <!-- STEP 2 -->
   <section class="card step">
     <div class="step-num"><span class="n">2</span><span class="lab">Learn to fly</span></div>
-    <h2>Learn to fly around your world</h2>
-    <p>In Studio you are like a bird in the sky, looking down at your plot. To fly: hold the <b>right mouse button</b> and move the mouse to look around. The <b>W A S D</b> keys move you around. <b>E</b> goes up, <b>Q</b> goes down. Scroll the wheel to zoom.</p>
+    <h2>Move around your world</h2>
+    <p>In Studio you look at your world from above, like a bird. Now you will learn to move. It is like moving in a normal Roblox game. Do these one at a time.</p>
     <div class="stage">
       <div class="keys">
         <span class="keycap lit k1">W</span><span class="keycap lit k2">A</span><span class="keycap lit k3">S</span>
@@ -277,20 +289,28 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Fly one full circle around your baseplate. Zoom out until it looks tiny, then dive down close to the ground.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Hold the <b>right mouse button</b>. Move the mouse. You look around.</li>
+          <li>Press <span class="keycapmini">W</span> to go forward. Try <span class="keycapmini">A</span> <span class="keycapmini">S</span> <span class="keycapmini">D</span> too.</li>
+          <li>Press <span class="keycapmini">E</span> to go up. Press <span class="keycapmini">Q</span> to go down.</li>
+          <li>Roll the mouse wheel to come near or go far.</li>
+        </ol>
+        <p class="after">Try each one. See what it does. 👀</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
-      <div class="h">🍌 BRAIN SNACK: The camera is not you</div>
-      <p>Flying around only changes what you are LOOKING at. It never breaks anything. It is like walking around a building site to inspect it. So fly anywhere, as fast as you want. You are safe.</p>
+      <div class="h">🍌 BRAIN SNACK: You cannot break anything</div>
+      <p>Moving around only changes what you SEE. It does not change your game. So move anywhere you want, fast or slow. You are safe. Have fun with it.</p>
     </div>
   </section>
 
   <!-- STEP 3 -->
   <section class="card step">
     <div class="step-num"><span class="n">3</span><span class="lab">The Explorer</span></div>
-    <h2>The Explorer: your game's register</h2>
-    <p>On the right is a panel called <b>Explorer</b>. It is the list of EVERYTHING in your game. Think of the school register: if your name is not on it, you are not in the class. Same here. If something is not in the Explorer, it is not in your game. Click the little arrows to unfold folders inside folders. Builders call this a "tree" because it branches like one.</p>
+    <h2>The Explorer: your game's list</h2>
+    <p>On the right side is a box called the <b>Explorer</b>. It is a list of everything in your game. It is like the class register at school. If your name is not on the register, you are not in the class. Same here. If a thing is not in the Explorer, it is not in your game. Click the small arrows to open the folders.</p>
     <div class="stage">
       <div class="tree">
         <div class="row">🎮 <b>Game</b></div>
@@ -300,12 +320,19 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Find "Workspace" in the Explorer and click its little arrow to open it. Peek at what is inside.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Look at the Explorer list.</li>
+          <li>Find the word <b>Workspace</b>.</li>
+          <li>Click the small arrow next to it.</li>
+          <li>Look at what is inside.</li>
+        </ol>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
-      <div class="h">🍌 BRAIN SNACK: Everything lives somewhere</div>
-      <p>Every block, every sword, every zombie has its name in the Explorer, sitting inside something else. Nothing floats around loose. When you get lost later (everyone does), check the register first. It is your map.</p>
+      <div class="h">🍌 BRAIN SNACK: Everything has a place</div>
+      <p>Every block and every thing in your game has its name in the Explorer. Nothing is hidden. If you ever feel lost, look at the Explorer first. It is your map.</p>
     </div>
   </section>
 
@@ -313,7 +340,7 @@
   <section class="card step">
     <div class="step-num"><span class="n">4</span><span class="lab">The Workspace</span></div>
     <h2>The Workspace: where the real world lives</h2>
-    <p>The Explorer lists many things, but one matters most today: <b>Workspace</b>. It holds the actual 3D world, the part players can see and touch. Think of a market: the Workspace is the stalls out front where customers walk. The other items are the storeroom at the back. Real, but customers never see them.</p>
+    <p>One part of the Explorer is the most important today: <b>Workspace</b>. It holds the real world that players can see and touch. Everything inside Workspace shows up in the game. Everything outside it stays hidden from players.</p>
     <div class="stage">
       <div style="text-align:center;">
         <div style="font-weight:800; margin-bottom:8px;">The list <span style="color:var(--sky);">IS</span> the world</div>
@@ -325,7 +352,14 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Inside Workspace, click "Baseplate". Watch the giant floor in the 3D world get a blue glow. You just proved the list and the world are connected!</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Open <b>Workspace</b> in the Explorer.</li>
+          <li>Click the word <b>Baseplate</b>.</li>
+          <li>Look at your floor. It gets a blue edge.</li>
+        </ol>
+        <p class="after">The blue edge shows the list and the world are joined. 🔗</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -334,7 +368,7 @@
   <section class="card step">
     <div class="step-num"><span class="n">5</span><span class="lab">Your first block</span></div>
     <h2>Drop your very first block 🧱</h2>
-    <p>Big moment. In Roblox, almost everything is built from <b>Parts</b>. A Part is one solid block, like one brick in a wall. Whole castles and cars are just many Parts stacked cleverly. At the top of Studio, in the Home tab, find the <b>Part</b> button and click it. A grey block appears! And look, a new name "Part" pops up in the Explorer. You put it on the register.</p>
+    <p>Big moment. In Roblox, almost everything is made from <b>Parts</b>. A Part is one block, like one brick in a wall. Big things like castles and cars are just many blocks put together. At the top of Studio, in the Home tab, find the <b>Part</b> button. Click it. A grey block appears! A new name, Part, also shows up in the Explorer.</p>
     <div class="stage">
       <div class="dropzone">
         <div class="dblock"></div>
@@ -342,25 +376,39 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Click the Part button. Then click your block and drag it somewhere else. That block is YOURS now.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Click the <b>Part</b> button.</li>
+          <li>Click your new grey block.</li>
+          <li>Hold the mouse and drag it to a new spot.</li>
+        </ol>
+        <p class="after">Nice! That block is yours now. 🧱</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
-      <div class="h">🍌 BRAIN SNACK: Big things are just small things stacked</div>
-      <p>That giant castle in your favorite game is not one magic object. It is hundreds of simple Parts, placed one at a time, by a person like you. Just like Fundi's nest. Kidogo kidogo.</p>
+      <div class="h">🍌 BRAIN SNACK: Big things are many small blocks</div>
+      <p>That big castle in your favourite game is not one magic thing. It is many simple blocks, placed one at a time, by a person like you. Just like Fundi's nest. Kidogo kidogo.</p>
     </div>
   </section>
 
   <!-- STEP 6 -->
   <section class="card step">
     <div class="step-num"><span class="n">6</span><span class="lab">Move it like a pro</span></div>
-    <h2>Move it like a pro</h2>
-    <p>Dragging is fine, but pros use the <b>Move tool</b>. Click your Part and switch on the Move tool. Colored arrows appear: red, green, and blue. Each arrow moves the block in ONE straight direction, like pushing a wheelbarrow on a straight path so it cannot wander sideways. This is how builders place things EXACTLY where they want.</p>
+    <h2>Move it the pro way</h2>
+    <p>Dragging works. But there is a better way: the <b>Move tool</b>. Click your block. Then turn on the Move tool. Three arrows appear: red, green, and blue. Each arrow moves the block in one straight line only. This helps you put it in the exact spot you want.</p>
     <div class="stage">
       <div class="movecube"><div class="arrow-stem"></div><div class="arrow-up"></div></div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Use the green arrow to lift your block up into the air. Yes, it just floats there. In YOUR world, you decide if things float.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Click your block.</li>
+          <li>Find the <b>green</b> arrow.</li>
+          <li>Pull it up.</li>
+        </ol>
+        <p class="after">Your block floats in the air! In your world, you make the rules. ✨</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -369,25 +417,32 @@
   <section class="card step">
     <div class="step-num"><span class="n">7</span><span class="lab">Paint it</span></div>
     <h2>Paint it and change what it is made of 🎨</h2>
-    <p>A grey block is boring. Click your Part, then find two magic buttons at the top. <b>Color</b> opens a box of colors, like choosing paint at the hardware shop. <b>Material</b> changes what the block is MADE of: grass, wood, metal, glass, or glowing neon. Same shape, totally different feeling.</p>
+    <p>A grey block is boring. Click your block. At the top, find two buttons. <b>Color</b> lets you pick a colour, like choosing paint at the shop. <b>Material</b> changes what the block is made of: grass, wood, metal, glass, or glowing neon. Same shape, new look.</p>
     <div class="stage">
       <div class="chameleon"></div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Make one block bright red neon. Then make a second Part (you know how now!) and turn it into grass or wood. Two blocks, two totally different vibes.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Click your block. Set Color to red. Set Material to Neon.</li>
+          <li>Make a new Part.</li>
+          <li>Give the new one grass or wood.</li>
+        </ol>
+        <p class="after">Now you have two blocks that look very different. 🎨</p>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
     <div class="snack">
       <div class="h">🍌 BRAIN SNACK: Try it, look, change it</div>
-      <p>Real builders try a color, look, and change it again. Nothing is wasted. And <b>Ctrl + Z</b> undoes your last move, like a magic eraser. You literally cannot ruin anything, so experiment like crazy.</p>
+      <p>Good builders try a colour, look at it, then change it again. Nothing is wasted. And <b>Ctrl + Z</b> undoes your last step, like a magic eraser. You cannot break anything. So try many things!</p>
     </div>
   </section>
 
   <!-- STEP 8 -->
   <section class="card step">
     <div class="step-num"><span class="n">8</span><span class="lab">Press play</span></div>
-    <h2>Press Play and walk in your own world 🏃</h2>
-    <p>Best part. Find the big <b>Play</b> button at the top and press it. Studio drops YOUR avatar into YOUR world. You are not the bird in the sky anymore. You are a player, standing on ground you built, walking past blocks you placed and painted. Every Roblox game you love started exactly like this. Press the red <b>Stop</b> button to go back to builder mode.</p>
+    <h2>Press Play and walk in your world 🏃</h2>
+    <p>Best part! Find the big <b>Play</b> button at the top. Press it. Now your character stands inside your world. You are not looking from the sky now. You walk on the ground you made, past the blocks you painted. Every Roblox game you love started like this. When you are done, press the red <b>Stop</b> button to go back.</p>
     <div class="stage">
       <div class="playrun">
         <div class="ground-line"></div>
@@ -396,7 +451,14 @@
       </div>
     </div>
     <div class="yourturn">
-      <div class="txt"><span class="kick">Your turn</span><p>Press Play. Walk to your neon block and jump on it. Then press Stop to come back to builder mode.</p></div>
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Play</b>.</li>
+          <li>Walk to your red neon block.</li>
+          <li>Jump on it.</li>
+          <li>Press <b>Stop</b> to go back.</li>
+        </ol>
+      </div>
       <button class="didit" data-step>I did it!</button>
     </div>
   </section>
@@ -411,10 +473,10 @@
   <!-- QUIZ -->
   <section>
     <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
-    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it. No pressure, just checking your brain caught it.</p>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to see the answer.</p>
     <div class="quizgrid">
       <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is the Explorer?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">The list of everything in your game, like a school register. Not on the list = not in the game.</div></div></div></button>
-      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is special about the Workspace?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">It holds the real 3D world players can see and walk in. The stalls out front, not the storeroom.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is special about the Workspace?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">It holds the real world that players can see and walk in.</div></div></div></button>
       <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is a Part?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">One solid block, the basic building stone of Roblox. Big things are just many Parts stacked together.</div></div></div></button>
       <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">You deleted the wrong thing. What saves you?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Ctrl + Z, the magic undo. Builders change things without fear because undo has their back.</div></div></div></button>
     </div>
@@ -424,8 +486,8 @@
   <section class="card tomorrow">
     <div class="eyebrow">🔮 Tomorrow · Day 2</div>
     <div class="mystery">🧱❓</div>
-    <h2>You build a block that KNOWS when you touch it</h2>
-    <p>Your world stops being quiet and starts to react to you. Your very first piece of real code.</p>
+    <h2>You make a block that knows when you touch it</h2>
+    <p>Your world stops being quiet. It starts to answer you. You write your first real code.</p>
   </section>
 
   <p class="parent-note">
@@ -512,7 +574,7 @@
       badge.textContent = '🪺';
       celebTitle.textContent = 'YOU DID IT! Day 1 Builder Badge earned 🎉';
       celebText.className = '';
-      celebText.textContent = 'This morning this world did not exist. Now there is a place with your blocks, your colors, and your floating neon light, and you can walk around inside it. You used the real tools. Fundi says this nest is strong. See you on Day 2!';
+      celebText.textContent = 'This morning, this world was not here. Now it is! It has your blocks, your colours, and your floating light. And you can walk inside it. You used the real tools. Fundi says your nest is strong. See you on Day 2!';
       var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
       if (animate) {
         celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
