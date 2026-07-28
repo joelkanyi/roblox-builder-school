@@ -1,0 +1,481 @@
+<title>Day 14 · Your Helper Robot</title>
+<style>
+  :root {
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun:#FFC531; --sky:#2E9BF0; --grass:#2FB35C; --coral:#FF5A47; --grape:#8B5CF6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r:22px; --maxw:880px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+      --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+      --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+  }
+  :root[data-theme="light"] { --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10); --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16); }
+  :root[data-theme="dark"] { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+    --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:18px; overflow-x:hidden; }
+  .mono { font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+
+  .topbar { position:sticky; top:0; z-index:60; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(8px); border-bottom:2px solid var(--line); }
+  .topbar .wrap { display:flex; align-items:center; gap:14px; height:58px; }
+  .homebtn { flex:none; width:40px; height:40px; border-radius:12px; background:var(--card); border:2px solid var(--line); display:grid; place-items:center; text-decoration:none; font-size:18px; }
+  .homebtn:hover { border-color:var(--sky); }
+  .daychip { font-weight:800; font-size:15px; background:var(--grape); color:#fff; padding:5px 12px; border-radius:999px; white-space:nowrap; }
+  .xp-wrap { flex:1; height:16px; background:var(--line); border-radius:999px; overflow:hidden; }
+  .xp-fill { height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--grape),var(--coral)); transition:width .5s cubic-bezier(.2,.9,.3,1.2); }
+  .xp-label { font-weight:800; font-size:14px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .xp-label b { color:var(--grape); }
+
+  .hero { position:relative; padding:38px 0 16px; text-align:center; }
+  .hero-block { width:88px; height:88px; margin:0 auto 6px; border-radius:18px; background:#8a8f9c; box-shadow:var(--shadow-lg); position:relative; animation:wake 4s ease-in-out infinite; }
+  @keyframes wake { 0%,55%{ background:#8a8f9c; transform:scale(1);} 65%{ background:var(--coral); transform:scale(1.12);} 85%{ background:var(--coral);} 100%{ background:#8a8f9c;} }
+  .hero-block .zzz { position:absolute; top:-22px; right:-8px; font-size:20px; animation:zzz 4s ease-in-out infinite; }
+  @keyframes zzz { 0%,50%{ opacity:1;} 60%,100%{ opacity:0;} }
+  .hero-block .spark { position:absolute; inset:0; display:grid; place-items:center; font-size:34px; opacity:0; animation:spark 4s ease-in-out infinite; }
+  @keyframes spark { 0%,58%{ opacity:0; transform:scale(.4);} 66%{ opacity:1; transform:scale(1);} 84%{ opacity:1;} 90%,100%{ opacity:0;} }
+  .eyebrow { font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--grape); font-size:13px; }
+  h1 { font-size:clamp(2rem,6.5vw,3.2rem); line-height:1.02; margin:8px 0 0; font-weight:900; letter-spacing:-.02em; text-wrap:balance; }
+  h1 .pop { color:var(--coral); }
+  .hook { font-size:clamp(1.05rem,2.6vw,1.28rem); color:var(--ink-soft); max-width:32ch; margin:14px auto 0; font-weight:600; }
+
+  section { padding:14px 0; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; margin:16px 0; }
+
+  .fundi { width:88px; height:88px; flex:none; animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+  .meet { display:flex; gap:18px; align-items:center; background:var(--sun-soft); border-color:color-mix(in srgb, var(--sun) 40%, var(--line)); }
+  .meet h3 { margin:0 0 4px; font-size:1.2rem; }
+  .meet p { margin:0; font-size:.95rem; color:var(--ink-soft); }
+  .meet .say { font-weight:800; color:#8a6a00; }
+  @media (prefers-color-scheme: dark){ .meet .say{ color:var(--sun);} }
+  :root[data-theme="dark"] .meet .say { color:var(--sun); }
+
+  .step-num { display:inline-flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .step-num .n { width:40px; height:40px; border-radius:12px; background:var(--grape); color:#fff; font-weight:900; font-size:20px; display:grid; place-items:center; box-shadow:var(--shadow); }
+  .step-num .lab { font-weight:800; letter-spacing:.1em; text-transform:uppercase; font-size:12px; color:var(--ink-faint); }
+  .step h2 { font-size:clamp(1.35rem,4vw,1.85rem); margin:2px 0 10px; font-weight:900; letter-spacing:-.01em; text-wrap:balance; }
+  .step p { margin:0 0 12px; color:var(--ink-soft); font-weight:500; }
+  .step p b, .step li b { color:var(--ink); }
+
+  .stage { background:linear-gradient(180deg,var(--grape-soft),transparent); border:2px dashed color-mix(in srgb, var(--grape) 35%, var(--line)); border-radius:16px; min-height:150px; display:grid; place-items:center; margin:8px 0 16px; padding:18px; overflow:hidden; }
+
+  /* code box (always dark, like a real editor) */
+  .code { position:relative; background:#191527; border:2px solid #2c2740; border-radius:14px; margin:6px 0 14px; overflow-x:auto; box-shadow:var(--shadow); }
+  .code .bar { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid #2c2740; }
+  .code .bar i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .code pre { margin:0; padding:16px 18px; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:15px; line-height:1.7; color:#EDE9FA; white-space:pre; }
+  .code .kw { color:#FF8FB0; } .code .fn { color:#7FD1FF; } .code .str { color:#8CE0B0; } .code .num { color:#FFC96B; } .code .cm { color:#8B84A0; }
+  .code.new { border-color:var(--grape); box-shadow:0 0 0 3px color-mix(in srgb, var(--grape) 25%, transparent); }
+  .newtag { position:absolute; top:-11px; right:14px; background:var(--grape); color:#fff; font-weight:800; font-size:10.5px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; }
+  .typehint { font-size:.82rem; color:var(--ink-faint); font-weight:600; margin:-6px 0 12px; }
+  .typehint b { color:var(--coral); }
+
+  .keycap { display:inline-grid; place-items:center; min-width:26px; height:26px; padding:0 6px; border-radius:7px; background:var(--card); border:1.5px solid var(--line); border-bottom-width:3px; font-weight:900; font-size:13px; font-family:ui-monospace,monospace; color:var(--ink-soft); vertical-align:middle; }
+
+  /* when-do panels */
+  .wd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .wd .panel { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px 18px; text-align:center; min-width:120px; box-shadow:var(--shadow); }
+  .wd .panel .t { font-weight:900; font-size:11px; letter-spacing:.1em; color:var(--ink-faint); }
+  .wd .panel .e { font-size:34px; }
+  .wd .arrow { font-size:26px; color:var(--grape); font-weight:900; }
+  .wd .when .t { color:var(--sky); } .wd .do .t { color:var(--coral); }
+
+  /* explorer tick/x */
+  .treecmp { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; }
+  .treebox { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px; flex:1; min-width:200px; }
+  .treebox.good { border-color:var(--grass); } .treebox.bad { border-color:var(--coral); }
+  .treebox .cap { font-weight:900; font-size:.85rem; margin-bottom:8px; }
+  .treebox.good .cap { color:var(--grass); } .treebox.bad .cap { color:var(--coral); }
+  .trow { padding:5px 8px; font-weight:700; font-size:.9rem; }
+  .trow.ind1 { margin-left:16px; color:var(--ink-soft); } .trow.ind2 { margin-left:34px; color:var(--ink-soft); }
+
+  .yourturn { background:var(--grass-soft); border:2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius:16px; padding:16px 18px; display:flex; gap:14px; align-items:center; }
+  .yourturn .txt { flex:1; } .yourturn .txt p { margin:0; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt ol { margin:2px 0 0; padding-left:22px; }
+  .yourturn .txt li { margin-bottom:5px; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt .after { margin:6px 0 0; color:var(--grass); font-weight:800; font-size:.95rem; }
+  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:4px; }
+  .didit { flex:none; border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:.95rem; color:#fff; background:var(--grass); padding:12px 18px; border-radius:999px; box-shadow:0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition:transform .1s, background .2s; white-space:nowrap; }
+  .didit:hover { transform:translateY(-2px); } .didit:active { transform:translateY(2px); }
+  .didit.done { background:var(--ink-faint); box-shadow:0 4px 0 rgba(0,0,0,.2); cursor:default; }
+  .didit.done::before { content:"✓ "; }
+
+  .snack { background:var(--sun-soft); border:2px solid color-mix(in srgb, var(--sun) 45%, var(--line)); border-radius:16px; padding:14px 18px; margin:16px 0; }
+  .snack .h { font-weight:900; font-size:.85rem; letter-spacing:.04em; color:#8a6a00; margin-bottom:4px; }
+  @media (prefers-color-scheme: dark){ .snack .h{ color:var(--sun);} }
+  :root[data-theme="dark"] .snack .h { color:var(--sun); }
+  .snack p { margin:0; font-size:.96rem; color:var(--ink-soft); font-weight:500; }
+
+  /* troubleshooter */
+  .trouble { background:var(--coral-soft); border:2px solid color-mix(in srgb, var(--coral) 40%, var(--line)); border-radius:16px; padding:6px 18px; margin:14px 0; }
+  .trouble summary { cursor:pointer; font-weight:900; padding:12px 0; list-style:none; color:var(--coral); }
+  .trouble summary::-webkit-details-marker { display:none; }
+  .trouble summary::before { content:"🔧 "; }
+  .trouble ol { margin:0 0 14px; padding-left:22px; color:var(--ink); font-weight:500; font-size:.95rem; }
+  .trouble li { margin-bottom:8px; }
+  .trouble b { color:var(--ink); }
+
+  .celebrate { text-align:center; background:linear-gradient(180deg,var(--grape-soft),var(--card)); border-color:color-mix(in srgb, var(--grape) 40%, var(--line)); }
+  .celebrate.locked { opacity:.5; filter:grayscale(.6); }
+  .celebrate h2 { font-size:clamp(1.5rem,5vw,2.2rem); margin:0 0 6px; }
+  .badge { width:120px; height:120px; margin:8px auto 4px; display:grid; place-items:center; font-size:60px; background:var(--grape); border-radius:50%; box-shadow:var(--shadow-lg); border:5px solid #fff; }
+  .celebrate.unlocked .badge { animation:pop .6s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes pop { 0%{ transform:scale(0) rotate(-40deg);} 100%{ transform:scale(1) rotate(0);} }
+  .locktext { font-weight:700; color:var(--ink-faint); font-size:.95rem; }
+
+  .quizgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:620px){ .quizgrid{ grid-template-columns:1fr;} }
+  .flip { background:transparent; perspective:1000px; min-height:160px; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--ink); }
+  .flip-inner { position:relative; width:100%; height:100%; min-height:160px; transition:transform .5s; transform-style:preserve-3d; }
+  .flip.flipped .flip-inner { transform:rotateY(180deg); }
+  .flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:16px; padding:18px; display:flex; flex-direction:column; justify-content:center; text-align:left; border:2px solid var(--line); }
+  .flip-front { background:var(--sky-soft); }
+  .flip-front .q { font-weight:800; font-size:1rem; color:var(--ink); }
+  .flip-front .tap { margin-top:auto; font-size:.8rem; color:var(--ink-faint); font-weight:700; }
+  .flip-back { background:var(--grass-soft); transform:rotateY(180deg); }
+  .flip-back .a { font-weight:600; font-size:.92rem; color:var(--ink); }
+
+  .tomorrow { text-align:center; background:#221B33; color:#fff; border:none; }
+  .tomorrow .eyebrow { color:var(--coral); }
+  .tomorrow h2 { color:#fff; margin:6px 0; }
+  .tomorrow p { color:#cfc8dd; max-width:34ch; margin:0 auto; }
+  .lava { font-size:48px; animation:lavapulse 1.4s ease-in-out infinite; }
+  @keyframes lavapulse { 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 6px var(--coral)); } 50%{ transform:scale(1.15); filter:drop-shadow(0 0 18px var(--coral)); } }
+
+  .parent-note { font-size:.82rem; color:var(--ink-faint); text-align:center; max-width:62ch; margin:20px auto 60px; padding:0 20px; }
+  .parent-note b { color:var(--ink-soft); }
+
+  #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
+  :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+</style>
+
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="index.html" class="homebtn" aria-label="Back to Builder School home">🏠</a>
+    <span class="daychip">🤖 Day 14</span>
+    <div class="xp-wrap"><div class="xp-fill" id="xpfill"></div></div>
+    <span class="xp-label"><b id="xpcount">0</b>/6 ⭐</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-block" aria-hidden="true"><span class="zzz">🤖</span><span class="spark">✅</span></div>
+    <div class="eyebrow">Roblox Builder School</div>
+    <h1>Your Helper <span class="pop">Robot</span></h1>
+    <p class="hook">A robot can write code for you. But YOU are the boss. You always check it.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card meet">
+    <svg class="fundi" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h3>Karibu back, Builder! 🐦</h3>
+      <p>Today is a big one. There are <b>helper robots</b> that can write code for you. Fundi likes them, but Fundi has one strong rule. A helper is like a person on the road who tells you the way to your house. Most times he is right. But sometimes he sends you the wrong way. So you never just trust him. You always <b>check</b>. Today you learn how to be the boss of your helper. <span class="say">Wewe ndio bosi.</span></p>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">1</span><span class="lab">Meet the helper</span></div>
+    <h2>There are robots that can write code</h2>
+    <p>Some computer helpers are called <b>AI</b>. You can talk to them in normal words. You say what you want, like "make my block jump," and the helper writes the code. They are very <b>fast</b>. They can be useful when you are stuck.</p>
+    <p>Think of a very fast friend. You ask him a question. He answers before you finish talking. That is a helper robot. Fast is nice. But fast is not the same as <b>right</b>.</p>
+    <div class="stage">
+      <div class="wd">
+        <div class="panel when"><div class="t">YOU ASK</div><div class="e">🗣️</div><div style="font-size:.8rem;font-weight:700;">"make it jump"</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel do"><div class="t">ROBOT GIVES</div><div class="e">🤖</div><div style="font-size:.8rem;font-weight:700;">some code</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Say one thing out loud you might ask a helper robot to make.</li>
+          <li>Like: "Make my coin spin."</li>
+          <li>Remember: fast is nice, but we still must check.</li>
+        </ol>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">2</span><span class="lab">The big warning</span></div>
+    <h2>A helper can be wrong</h2>
+    <p>Here is the most important part. A helper robot is <b>not</b> always right. It can give you code that does not work. Or code that does the wrong thing. It looks sure of itself, but it can still be wrong.</p>
+    <p>It is like a person who gives you directions to your house. He points left with a big smile. But left is the wrong way! He was sure, and he was wrong. So you do not just follow. You look with your own eyes first.</p>
+    <div class="stage">
+      <div class="treecmp">
+        <div class="treebox good">
+          <div class="cap">✅ Smart builder</div>
+          <div class="trow">🤖 Robot gives code</div>
+          <div class="trow ind1">👀 I check it</div>
+          <div class="trow ind1">▶️ I test it</div>
+        </div>
+        <div class="treebox bad">
+          <div class="cap">❌ Not this</div>
+          <div class="trow">🤖 Robot gives code</div>
+          <div class="trow ind1">🙈 I just trust it</div>
+          <div class="trow ind1">😵 It breaks later</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Say this rule out loud: "A robot can be wrong."</li>
+          <li>Say it again: "So I always check."</li>
+        </ol>
+        <p class="after">Now you think like a boss. 👑</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Fast is not the same as right</div>
+      <p>An AI helper answers very fast. That feels like it must be smart. But speed is not truth. A wrong answer can come just as fast as a right one. So you always TEST before you trust.</p>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">3</span><span class="lab">Rule one: test</span></div>
+    <h2>Rule one: always TEST the code</h2>
+    <p>The first rule is easy. After the helper writes code, you <b>test</b> it. You press <b>Play</b>. Then you watch. Ask yourself one simple question: does it really do what I wanted?</p>
+    <p>If yes, good. If no, then the robot was wrong this time. That is fine. Now you know, because you tested. You did not just believe it.</p>
+    <div class="stage">
+      <div class="wd">
+        <div class="panel when"><div class="t">STEP</div><div class="e">📋</div><div style="font-size:.8rem;font-weight:700;">paste the code</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel do"><div class="t">STEP</div><div class="e">▶️</div><div style="font-size:.8rem;font-weight:700;">press Play</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel when"><div class="t">STEP</div><div class="e">👀</div><div style="font-size:.8rem;font-weight:700;">watch and check</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Say the three words: paste, Play, watch.</li>
+          <li>Ask: "Does it do what I wanted?"</li>
+          <li>If no, the robot was wrong. And that is okay.</li>
+        </ol>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">4</span><span class="lab">The boss test</span></div>
+    <h2>The boss test: change ONE thing</h2>
+    <p>This is the big one. After the code works, do the <b>boss test</b>. Change <b>one</b> small thing in the code. Just one. Then test again.</p>
+    <p>If you can change one thing and it still makes sense to you, then the code is really <b>yours</b>. You understand it. Good.</p>
+    <p>But if you look at the code and you have <b>no idea</b> what any of it means, do not just keep it. That is the warning sign. Ask the helper to explain it in simple words. Or ask an adult. Never keep code you cannot understand at all.</p>
+    <div class="stage">
+      <div class="treecmp">
+        <div class="treebox good">
+          <div class="cap">✅ It is really mine</div>
+          <div class="trow">🔧 I changed one thing</div>
+          <div class="trow ind1">💡 It still makes sense</div>
+          <div class="trow ind1">😎 I am the boss</div>
+        </div>
+        <div class="treebox bad">
+          <div class="cap">❌ Stop and ask</div>
+          <div class="trow">❓ I understand none of it</div>
+          <div class="trow ind1">🙋 Ask helper to explain</div>
+          <div class="trow ind1">🧑 Or ask an adult</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Say the boss test: "Change one thing. Test again."</li>
+          <li>Say the warning: "If I understand none of it, I ask first."</li>
+        </ol>
+        <p class="after">You are the boss. The robot works for you. 👑</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: If you cannot change it, do not keep it</div>
+      <p>Code you cannot understand at all is not really yours yet. Keeping it is like copying an answer you cannot read. If you cannot change even one part, stop and ask for it in simple words. Then it becomes yours.</p>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">5</span><span class="lab">Try it for real</span></div>
+    <h2>Try it: a block that changes colour</h2>
+    <p>Let us try the whole thing. Imagine you ask a helper: "Make this block slowly change colour." The helper gives you this code:</p>
+    <div class="code new"><span class="newtag">FROM THE HELPER</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> part = script.Parent
+<span class="kw">while</span> <span class="kw">true</span> <span class="kw">do</span>
+    part.Color = Color3.<span class="fn">fromRGB</span>(<span class="num">255</span>, <span class="num">0</span>, <span class="num">0</span>)
+    task.<span class="fn">wait</span>(<span class="num">1</span>)
+    part.Color = Color3.<span class="fn">fromRGB</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">255</span>)
+    task.<span class="fn">wait</span>(<span class="num">1</span>)
+<span class="kw">end</span></pre></div>
+    <p>You do <b>not</b> need to understand every line today. The word <b>while</b> is a loop. You will learn loops later. That is fine for now. But you CAN see the colour numbers, and the <b>wait</b> number. So you can do the boss test on those.</p>
+    <p class="typehint">Careful: capital <b>C</b> in <span class="mono">Color</span>, and keep the two brackets and commas the same.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Make a Part.</li>
+          <li>Put a Script inside it.</li>
+          <li>Delete what is in the Script. Type the helper code above.</li>
+          <li>Press <b>Play</b>. Watch the block. Red, then blue, again and again?</li>
+        </ol>
+        <p class="after">You just TESTED the robot's code. 👀</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: YOU are the boss, the robot is the tool</div>
+      <p>A hammer does not decide what to build. You do. The robot is a tool like that. It gives you code, but you decide if the code is good. And you decide by testing it, not by hoping.</p>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">6</span><span class="lab">Prove you are boss</span></div>
+    <h2>Change one thing. Prove you are the boss. 👑</h2>
+    <p>The block works. Now do the <b>boss test</b>. Change one thing and test again. This proves the code is really yours, not just the robot's.</p>
+    <p>Try changing one colour to green. Green is <span class="mono">0, 255, 0</span>. Or change a <b>wait</b> number from <span class="mono">1</span> to <span class="mono">2</span>, so the colour stays longer. Change just one thing. Then press Play and see the difference.</p>
+    <div class="code new"><span class="newtag">YOUR CHANGE</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre>    part.Color = Color3.<span class="fn">fromRGB</span>(<span class="num">0</span>, <span class="num">255</span>, <span class="num">0</span>)
+    task.<span class="fn">wait</span>(<span class="num">2</span>)</pre></div>
+    <p>You changed the robot's code and you know what will happen. That is the whole lesson. The helper is a <b>tool</b>. YOU are the <b>boss</b>. You always test to decide if the code is good.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Stop</b>. Change one colour to <span class="mono">0, 255, 0</span> for green.</li>
+          <li>Or change a <b>wait</b> from <span class="mono">1</span> to <span class="mono">2</span>.</li>
+          <li>Press <b>Play</b>. See the new colour or the slower change.</li>
+          <li>Say it: "I am the boss. I checked and I tested."</li>
+        </ol>
+        <p class="after">You just proved the code is yours! 👑</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <details class="trouble">
+      <summary>The block did not change? Tap here, do not panic</summary>
+      <ol>
+        <li><b>Is the Script INSIDE the Part?</b> Check the Explorer. The Script must sit under your Part, not next to it. If it is in the wrong place, hold the left mouse button on the Script and drag it onto the Part, then let go.</li>
+        <li><b>Look for red text in the Output window.</b> Red text is the computer HELPING you. It points at the line with the problem. Check for a tiny typo, like a small letter that should be capital (<span class="mono">Color</span>), or a missing bracket or comma.</li>
+      </ol>
+    </details>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: The helper is a tool, YOU are the boss</div>
+      <p>This rule stays with you forever, even when you are big. A helper robot can write, but it cannot decide for you if the work is good. Only you can, and only by testing. Use the tool. Stay the boss.</p>
+    </div>
+  </section>
+
+  <!-- CELEBRATION -->
+  <section class="card celebrate locked" id="celebrate">
+    <div class="badge" id="badge">🔒</div>
+    <h2 id="celebTitle">Finish all 6 steps to earn your badge</h2>
+    <p id="celebText" class="locktext">Tick off each "I did it!" as you go. Your Day 14 Boss Builder Badge is waiting.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section>
+    <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it.</p>
+    <div class="quizgrid">
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">A helper robot gave you code very fast. Can you just trust it?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">No. Fast is not the same as right. A robot can be wrong, like a person who points the wrong way to your house. You always check and test.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is rule one, right after the robot writes code?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">TEST it. Press Play and watch. Ask: does it really do what I wanted? If not, the robot was wrong this time.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is the boss test?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Change ONE thing, then test again. If it still makes sense, the code is really yours. If you understand none of it, ask the helper or an adult first.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Who is the boss, you or the robot?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">YOU are the boss. The robot is a tool. You decide if the code is good, and you decide by testing it.</div></div></div></button>
+    </div>
+  </section>
+
+  <!-- TOMORROW -->
+  <section class="card tomorrow">
+    <div class="eyebrow">🔮 Tomorrow · Day 15</div>
+    <div class="lava">🎉</div>
+    <h2>Your big showcase</h2>
+    <p>Tomorrow you put everything together. You show off your game to the world. All your days come alive in one place. Get ready.</p>
+  </section>
+
+  <p class="parent-note">
+    <b>For the parent:</b> today teaches a checking habit, not AI use. A young child should only use an AI helper <b>with an adult</b>, and only on a <b>parent-approved, kid-safe tool</b>. The goal is not to depend on AI, it is to build the habit of testing and understanding any code before keeping it. For the check-in, ask him to <b>change one thing</b> in the code and predict what will happen before he presses Play, then say who the boss is. The answer we want is: he is.
+  </p>
+
+</main>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DAY = 'day14';
+    var steps = document.querySelectorAll('[data-step]');
+    var total = steps.length;
+    var done = 0;
+    var fill = document.getElementById('xpfill');
+    var count = document.getElementById('xpcount');
+    var celebrate = document.getElementById('celebrate');
+    var badge = document.getElementById('badge');
+    var celebTitle = document.getElementById('celebTitle');
+    var celebText = document.getElementById('celebText');
+
+    function loadProgress(){ try { return JSON.parse(localStorage.getItem('rbs_progress') || '{}'); } catch (e) { return {}; } }
+    function saveProgress(p){ try { localStorage.setItem('rbs_progress', JSON.stringify(p)); } catch (e) {} }
+    function recordStep(idx){ var p = loadProgress(); p[DAY] = p[DAY] || { steps: [], done: false }; if (p[DAY].steps.indexOf(idx) === -1) p[DAY].steps.push(idx); if (p[DAY].steps.length >= total) p[DAY].done = true; saveProgress(p); }
+
+    steps.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('done')) return;
+        markDone(btn); recordStep(idx); smallPop(btn);
+        if (done === total) finish(true);
+      });
+    });
+    function markDone(btn){ btn.classList.add('done'); btn.textContent = 'Done!'; done++; fill.style.width = Math.round((done/total)*100) + '%'; count.textContent = done; }
+    (function restore(){ var p = loadProgress(); var saved = (p[DAY] && p[DAY].steps) || []; steps.forEach(function (btn, idx){ if (saved.indexOf(idx) !== -1) markDone(btn); }); if (done === total) finish(false); })();
+
+    function finish(animate){
+      celebrate.classList.remove('locked'); celebrate.classList.add('unlocked');
+      badge.textContent = '🤖';
+      celebTitle.textContent = 'YOU DID IT! Day 14 Boss Builder Badge earned 🎉';
+      celebText.className = '';
+      celebText.textContent = 'Today you learned the most important rule about helper robots. A robot can write code fast, but it can also be wrong, like a person who points the wrong way to your house. So you never just trust it. You TEST it by pressing Play. Then you do the boss test: change one thing and check it still makes sense. If you understand none of it, you ask first. The helper is a tool. YOU are the boss. Keep that rule forever. See you on Day 15!';
+      var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
+      if (animate){ celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); if (!reduce) confettiBurst(); }
+    }
+    function smallPop(el){ if (reduce) return; el.animate([{ transform:'scale(1)' },{ transform:'scale(1.15)' },{ transform:'scale(1)' }], { duration:260, easing:'ease-out' }); }
+
+    document.querySelectorAll('.flip').forEach(function (f){ f.addEventListener('click', function(){ f.classList.toggle('flipped'); }); });
+
+    function confettiBurst(){
+      var cv = document.getElementById('confetti'); var ctx = cv.getContext('2d');
+      var W = cv.width = window.innerWidth, H = cv.height = window.innerHeight;
+      var cols = ['#FF5A47','#2E9BF0','#2FB35C','#FFC531','#8B5CF6']; var bits = [];
+      for (var i=0;i<140;i++){ bits.push({ x:W/2, y:H/3, vx:(Math.random()-0.5)*14, vy:Math.random()*-15-4, s:6+Math.random()*8, c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-0.5)*0.4 }); }
+      var t=0;
+      function frame(){ ctx.clearRect(0,0,W,H); t++; bits.forEach(function(p){ p.vy+=0.4; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); if (t<160) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H); }
+      frame();
+    }
+  })();
+</script>

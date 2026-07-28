@@ -175,6 +175,13 @@
   @media (prefers-color-scheme: dark){ .snack .h { color: var(--sun); } }
   :root[data-theme="dark"] .snack .h { color: var(--sun); }
   .snack p { margin: 0; font-size: .96rem; color: var(--ink-soft); font-weight: 500; }
+  .trouble { background: var(--coral-soft); border: 2px solid color-mix(in srgb, var(--coral) 40%, var(--line)); border-radius: 16px; padding: 6px 18px; margin: 14px 0; }
+  .trouble summary { cursor: pointer; font-weight: 900; padding: 12px 0; list-style: none; color: var(--coral); }
+  .trouble summary::-webkit-details-marker { display: none; }
+  .trouble summary::before { content: "\1F527  "; }
+  .trouble ol { margin: 0 0 14px; padding-left: 22px; color: var(--ink); font-weight: 500; font-size: .95rem; }
+  .trouble li { margin-bottom: 8px; }
+  .trouble b { color: var(--ink); }
 
   /* celebration */
   .celebrate { text-align: center; background: linear-gradient(180deg, var(--grape-soft), var(--card)); border-color: color-mix(in srgb, var(--grape) 40%, var(--line)); position: relative; }
@@ -378,11 +385,11 @@
     <div class="yourturn">
       <div class="txt"><span class="kick">Your turn</span>
         <ol>
-          <li>Click the <b>Part</b> button.</li>
-          <li>Click your new grey block.</li>
-          <li>Hold the <b>left mouse button</b> on the block. Move the mouse, then let go.</li>
+          <li>At the top, in the <b>Home</b> tab, click the <b>Part</b> button. A grey block appears.</li>
+          <li>Click on the block one time. It gets a <b>blue outline</b>. That means it is chosen.</li>
+          <li>Now hold the <b>left mouse button</b> on the block, move the mouse, then let go. The block slides along the ground.</li>
         </ol>
-        <p class="after">Nice! That block is yours now. 🧱</p>
+        <p class="after">If it does not move, click the block first so it has the blue outline. 🧱</p>
       </div>
       <button class="didit" data-step>I did it!</button>
     </div>
@@ -396,21 +403,31 @@
   <section class="card step">
     <div class="step-num"><span class="n">6</span><span class="lab">Move it like a pro</span></div>
     <h2>Move it the pro way</h2>
-    <p>Dragging works. But there is a better way: the <b>Move tool</b>. Click your block. Then turn on the Move tool. Three arrows appear: red, green, and blue. Each arrow moves the block in one straight line only. This helps you put it in the exact spot you want.</p>
+    <p>There is a neat way to move a block: the <b>Move tool</b>. When it is on, three arrows appear on your block: red, green, and blue. Each arrow moves the block in one straight line only (green is up and down). This helps you put the block in the exact spot you want.</p>
     <div class="stage">
       <div class="movecube"><div class="arrow-stem"></div><div class="arrow-up"></div></div>
     </div>
     <div class="yourturn">
       <div class="txt"><span class="kick">Your turn</span>
         <ol>
-          <li>Click your block.</li>
-          <li>Find the <b>green</b> arrow.</li>
-          <li>Pull it up.</li>
+          <li>Click your block one time so it has the <b>blue outline</b>.</li>
+          <li>At the top, click the <b>Home</b> tab.</li>
+          <li>In the row of buttons, click <b>Move</b> (the button with arrows).</li>
+          <li>Red, green, and blue arrows now show on your block.</li>
+          <li>Put your mouse on the <b>green</b> arrow. Hold the left mouse button and pull up.</li>
         </ol>
         <p class="after">Your block floats in the air! In your world, you make the rules. ✨</p>
       </div>
       <button class="didit" data-step>I did it!</button>
     </div>
+    <details class="trouble">
+      <summary>No arrows? No blue outline? Tap here</summary>
+      <ol>
+        <li><b>Do you see a blue outline on the block?</b> If not, click the block one time to choose it. The Move tool only works on a chosen block.</li>
+        <li><b>Did you click Home, then Move?</b> The arrows only show when the Move tool is turned on.</li>
+        <li><b>Arrows too small?</b> Roll the mouse wheel to zoom in close to the block. Then the arrows are big and easy to grab.</li>
+      </ol>
+    </details>
   </section>
 
   <!-- STEP 7 -->
