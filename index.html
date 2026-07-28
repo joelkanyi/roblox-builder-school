@@ -1,0 +1,168 @@
+<title>Roblox Builder School</title>
+<style>
+  :root {
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun:#FFC531; --sky:#2E9BF0; --grass:#2FB35C; --coral:#FF5A47; --grape:#8B5CF6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r:22px; --maxw:960px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+      --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+      --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+  }
+  :root[data-theme="light"] { --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10); --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16); }
+  :root[data-theme="dark"] { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+    --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+
+  * { box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:18px; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+
+  header { text-align:center; padding:48px 0 20px; }
+  .fundi { width:96px; height:96px; animation:bob 2.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+  h1 { font-size:clamp(2rem,6vw,3.1rem); font-weight:900; letter-spacing:-.02em; margin:6px 0 0; text-wrap:balance; }
+  h1 .a{color:var(--coral);} h1 .b{color:var(--sky);} h1 .c{color:var(--grass);}
+  .sub { color:var(--ink-soft); font-weight:600; margin:10px 0 0; font-size:1.08rem; }
+
+  .progress-card { background:var(--card); border:2px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:20px 22px; margin:22px 0 8px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .progress-card .big { font-weight:900; font-size:1.15rem; white-space:nowrap; }
+  .progress-card .big b { color:var(--grass); font-size:1.4rem; }
+  .slots { display:flex; gap:6px; flex:1; flex-wrap:wrap; justify-content:flex-end; }
+  .slot { width:26px; height:26px; border-radius:50%; background:var(--line); display:grid; place-items:center; font-size:15px; }
+  .slot.filled { background:var(--sun); }
+
+  .weektitle { display:flex; align-items:center; gap:12px; margin:34px 0 4px; }
+  .weektitle .wtag { font-family:ui-monospace,monospace; font-weight:800; font-size:12px; letter-spacing:.06em; color:#fff; background:var(--grape); padding:5px 11px; border-radius:8px; }
+  .weektitle h2 { font-size:1.35rem; margin:0; font-weight:900; }
+  .weektitle .line { flex:1; height:2px; background:var(--line); border-radius:2px; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-top:14px; }
+  .day { position:relative; text-align:left; text-decoration:none; color:inherit; background:var(--card); border:2px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:18px; display:flex; flex-direction:column; gap:8px; min-height:150px; transition:transform .12s, box-shadow .2s, border-color .2s; }
+  .day.playable:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:var(--sky); }
+  .day .top { display:flex; align-items:center; justify-content:space-between; }
+  .day .dn { font-family:ui-monospace,monospace; font-weight:800; font-size:12px; color:var(--ink-faint); letter-spacing:.05em; }
+  .day .emoji { font-size:30px; }
+  .day h3 { margin:2px 0 0; font-size:1.12rem; font-weight:900; line-height:1.15; text-wrap:balance; }
+  .day p { margin:0; font-size:.86rem; color:var(--ink-soft); font-weight:500; }
+  .day .status { margin-top:auto; font-weight:900; font-size:.82rem; padding:5px 11px; border-radius:999px; align-self:flex-start; }
+  .day.playable .status { background:var(--grass); color:#fff; }
+  .day.done .status { background:var(--sun); color:#4A3A00; }
+  .day.soon { opacity:.62; }
+  .day.soon .status { background:var(--line); color:var(--ink-faint); }
+  .day.soon .emoji { filter:grayscale(1); opacity:.7; }
+  .day .locknote { position:absolute; top:14px; right:14px; font-size:16px; }
+
+  footer { text-align:center; padding:36px 20px 60px; }
+  .parent { display:inline-block; max-width:64ch; font-size:.84rem; color:var(--ink-faint); background:var(--card); border:2px solid var(--line); border-radius:16px; padding:16px 20px; }
+  .parent b { color:var(--ink-soft); }
+  :where(a):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+</style>
+
+<header>
+  <div class="wrap">
+    <svg class="fundi" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <h1>Roblox <span class="a">Builder</span> <span class="b">School</span></h1>
+    <p class="sub">Your quest to become a game maker. <span class="c">One block at a time.</span></p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="progress-card">
+    <div class="big">🪺 Badges earned: <b id="badgeCount">0</b> / 15</div>
+    <div class="slots" id="slots"></div>
+  </div>
+
+  <div class="weektitle"><span class="wtag">WEEK 1</span><h2>Build a world</h2><div class="line"></div></div>
+  <div class="grid" id="w1"></div>
+
+  <div class="weektitle"><span class="wtag">WEEK 2</span><h2>Make it think</h2><div class="line"></div></div>
+  <div class="grid" id="w2"></div>
+
+  <div class="weektitle"><span class="wtag">WEEK 3</span><h2>Ship it to the world</h2><div class="line"></div></div>
+  <div class="grid" id="w3"></div>
+
+</main>
+
+<footer>
+  <span class="parent"><b>For the parent:</b> this page and every lesson live as normal files, so he just opens this page and clicks a day. His progress is saved in this browser (badges and ticked steps), so use the same browser each time. Day 1 is ready to play now. The rest unlock as they are added.</span>
+</footer>
+
+<script>
+  var DAYS = [
+    { n:1, week:1, emoji:'🧱', title:'You Are a World Builder', blurb:'Open Studio, place your first blocks, walk around your own world.', file:'day1.html' },
+    { n:2, week:1, emoji:'⚡', title:'The Block That Reacts', blurb:'Write your first code so a block knows when you touch it.' },
+    { n:3, week:1, emoji:'🌋', title:'The Deadly Lava', blurb:'Make a trap that reacts to players. Your first real game rule.' },
+    { n:4, week:1, emoji:'🏃', title:'Build Your Obby', blurb:'Turn your blocks into a real obstacle course to jump through.' },
+    { n:5, week:1, emoji:'🚩', title:'Checkpoints', blurb:'Save the player’s progress so death is not back to the start.' },
+    { n:6, week:2, emoji:'📢', title:'Publish Your Game', blurb:'Put your game online for free and play it on your phone.' },
+    { n:7, week:2, emoji:'🏆', title:'The Scoreboard', blurb:'Add a live Wins counter. Meet variables, the game’s memory.' },
+    { n:8, week:2, emoji:'✨', title:'Power-Ups', blurb:'Build speed pads and bounce pads with reusable functions.' },
+    { n:9, week:2, emoji:'🪙', title:'Collect the Coins', blurb:'A reason to keep playing: earn coins that climb the board.' },
+    { n:10, week:2, emoji:'🎛️', title:'A Button on Screen', blurb:'Add a menu button players can tap. Meet the screen code.' },
+    { n:11, week:3, emoji:'🎨', title:'Make It Yours', blurb:'Name it, design an icon and thumbnail, invent your theme.' },
+    { n:12, week:3, emoji:'🌍', title:'Ship to Real People', blurb:'Go public and share the link with friends and the world.' },
+    { n:13, week:3, emoji:'👀', title:'Watch and Fix', blurb:'Watch someone play, then fix the thing that confused them.' },
+    { n:14, week:3, emoji:'🤖', title:'Your Helper Robot', blurb:'Meet a coding helper and learn to check its work, not just trust it.' },
+    { n:15, week:3, emoji:'🎉', title:'Your Big Showcase', blurb:'Put it all together and show off the game you built.' }
+  ];
+
+  function loadProgress(){ try { return JSON.parse(localStorage.getItem('rbs_progress')||'{}'); } catch(e){ return {}; } }
+  var prog = loadProgress();
+
+  function isDone(n){ var d = prog['day'+n]; return !!(d && d.done); }
+
+  var badgeCount = 0;
+  DAYS.forEach(function(d){ if (isDone(d.n)) badgeCount++; });
+  document.getElementById('badgeCount').textContent = badgeCount;
+
+  var slots = document.getElementById('slots');
+  DAYS.forEach(function(d){
+    var s = document.createElement('div');
+    s.className = 'slot' + (isDone(d.n) ? ' filled' : '');
+    s.textContent = isDone(d.n) ? '🪺' : '';
+    slots.appendChild(s);
+  });
+
+  DAYS.forEach(function(d){
+    var built = !!d.file;
+    var done = isDone(d.n);
+    // sequential unlock: a built day opens only if it is Day 1 or the previous day is done
+    var unlocked = built && (d.n === 1 || isDone(d.n - 1));
+    var playable = unlocked; // (done days stay replayable)
+
+    var state, status, corner;
+    if (done) { state = 'done'; status = '★ Done'; corner = '🪺'; }
+    else if (unlocked) { state = 'playable'; status = '▶ Play now'; corner = ''; }
+    else if (built) { state = 'soon locked'; status = 'Finish Day ' + (d.n - 1) + ' first'; corner = '🔒'; }
+    else { state = 'soon'; status = 'Coming soon'; corner = '🔒'; }
+
+    var el = document.createElement(playable ? 'a' : 'div');
+    if (playable) el.href = d.file;
+    el.className = 'day ' + state;
+    el.innerHTML =
+      '<div class="top"><span class="dn">DAY ' + d.n + '</span><span class="emoji">' + d.emoji + '</span></div>' +
+      '<h3>' + d.title + '</h3>' +
+      '<p>' + d.blurb + '</p>' +
+      '<span class="status">' + status + '</span>' +
+      (corner ? '<span class="locknote">' + corner + '</span>' : '');
+    document.getElementById('w' + d.week).appendChild(el);
+  });
+</script>

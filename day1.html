@@ -1,0 +1,557 @@
+<title>Day 1 · You Are a World Builder</title>
+<style>
+  :root {
+    --paper: #FFF7EA;
+    --card: #FFFFFF;
+    --ink: #221B33;
+    --ink-soft: #5A5170;
+    --ink-faint: #8B84A0;
+    --line: #EFE6D6;
+    --sun: #FFC531;
+    --sky: #2E9BF0;
+    --grass: #2FB35C;
+    --coral: #FF5A47;
+    --grape: #8B5CF6;
+    --sun-soft: #FFF1CC;
+    --sky-soft: #DCEFFF;
+    --grass-soft: #D6F5E1;
+    --coral-soft: #FFE1DC;
+    --grape-soft: #EBE3FF;
+    --shadow: 0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg: 0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r: 22px;
+    --maxw: 880px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14121C; --card: #1E1B29; --ink: #F3EFFA; --ink-soft: #B9B2CC;
+      --ink-faint: #8B84A0; --line: #2C2839;
+      --sun-soft: #33280E; --sky-soft: #10283D; --grass-soft: #10301E;
+      --coral-soft: #351712; --grape-soft: #211838;
+      --shadow: 0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45);
+      --shadow-lg: 0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #FFF7EA; --card: #FFFFFF; --ink: #221B33; --ink-soft: #5A5170; --ink-faint: #8B84A0; --line: #EFE6D6;
+    --sun-soft: #FFF1CC; --sky-soft: #DCEFFF; --grass-soft: #D6F5E1; --coral-soft: #FFE1DC; --grape-soft: #EBE3FF;
+    --shadow: 0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg: 0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14121C; --card: #1E1B29; --ink: #F3EFFA; --ink-soft: #B9B2CC; --ink-faint: #8B84A0; --line: #2C2839;
+    --sun-soft: #33280E; --sky-soft: #10283D; --grass-soft: #10301E; --coral-soft: #351712; --grape-soft: #211838;
+    --shadow: 0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45);
+    --shadow-lg: 0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; } }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Baloo 2", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    line-height: 1.55; -webkit-font-smoothing: antialiased; font-size: 18px;
+    overflow-x: hidden;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+  /* progress bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 60; background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 2px solid var(--line);
+  }
+  .topbar .wrap { display: flex; align-items: center; gap: 14px; height: 58px; }
+  .homebtn { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--card); border: 2px solid var(--line); display: grid; place-items: center; text-decoration: none; font-size: 18px; }
+  .homebtn:hover { border-color: var(--sky); }
+  .daychip { font-weight: 800; font-size: 15px; background: var(--sun); color: #4A3A00; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+  .xp-wrap { flex: 1; height: 16px; background: var(--line); border-radius: 999px; overflow: hidden; position: relative; }
+  .xp-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--grass), var(--sun)); transition: width .5s cubic-bezier(.2,.9,.3,1.2); }
+  .xp-label { font-weight: 800; font-size: 14px; color: var(--ink-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .xp-label b { color: var(--grass); }
+
+  /* hero */
+  .hero { position: relative; padding: 42px 0 20px; text-align: center; overflow: hidden; }
+  .hero-scene { position: relative; height: 140px; margin: 0 auto 6px; max-width: 520px; }
+  .fall { position: absolute; top: -40px; width: 34px; height: 34px; border-radius: 9px; box-shadow: var(--shadow); animation: fall 3.4s ease-in infinite; }
+  @keyframes fall { 0% { transform: translateY(-40px) rotate(0); opacity: 0; } 15% { opacity: 1; } 70% { transform: translateY(150px) rotate(20deg); opacity: 1; } 100% { transform: translateY(160px) rotate(20deg); opacity: 0; } }
+  .eyebrow { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--sky); font-size: 13px; }
+  h1 { font-size: clamp(2.1rem, 7vw, 3.4rem); line-height: 1.02; margin: 8px 0 0; font-weight: 900; letter-spacing: -.02em; text-wrap: balance; }
+  h1 .pop { color: var(--coral); }
+  .hook { font-size: clamp(1.05rem, 2.6vw, 1.3rem); color: var(--ink-soft); max-width: 30ch; margin: 14px auto 0; font-weight: 600; }
+
+  section { padding: 14px 0; }
+  .card { background: var(--card); border: 2px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 24px; margin: 16px 0; }
+
+  /* mascot */
+  .fundi { width: 92px; height: 92px; flex: none; }
+  .fundi.bob { animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+  .meet { display: flex; gap: 18px; align-items: center; background: var(--sun-soft); border-color: color-mix(in srgb, var(--sun) 40%, var(--line)); }
+  .meet h3 { margin: 0 0 4px; font-size: 1.3rem; }
+  .meet p { margin: 0; font-size: .95rem; color: var(--ink-soft); }
+  .meet .say { font-weight: 800; color: #8a6a00; }
+  @media (prefers-color-scheme: dark){ .meet .say { color: var(--sun); } }
+  :root[data-theme="dark"] .meet .say { color: var(--sun); }
+
+  /* steps */
+  .step { position: relative; }
+  .step-num { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .step-num .n { width: 40px; height: 40px; border-radius: 12px; background: var(--sky); color: #fff; font-weight: 900; font-size: 20px; display: grid; place-items: center; box-shadow: var(--shadow); }
+  .step-num .lab { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 12px; color: var(--ink-faint); }
+  .step h2 { font-size: clamp(1.4rem, 4vw, 1.9rem); margin: 2px 0 10px; font-weight: 900; letter-spacing: -.01em; text-wrap: balance; }
+  .step p { margin: 0 0 12px; color: var(--ink-soft); font-weight: 500; }
+  .step p b, .step li b { color: var(--ink); }
+
+  /* visual stage */
+  .stage { background: linear-gradient(180deg, var(--sky-soft), transparent); border: 2px dashed color-mix(in srgb, var(--sky) 35%, var(--line)); border-radius: 16px; min-height: 170px; display: grid; place-items: center; margin: 8px 0 16px; padding: 18px; overflow: hidden; position: relative; }
+
+  /* keycaps */
+  .keys { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .keycap { width: 46px; height: 46px; border-radius: 10px; background: var(--card); border: 2px solid var(--line); border-bottom-width: 4px; display: grid; place-items: center; font-weight: 900; font-size: 17px; color: var(--ink-soft); }
+  .keycap.lit { animation: litkey 3.6s infinite; }
+  .keycap.k1 { animation-delay: 0s; } .keycap.k2 { animation-delay: .4s; } .keycap.k3 { animation-delay: .8s; } .keycap.k4 { animation-delay: 1.2s; } .keycap.k5 { animation-delay: 1.6s; } .keycap.k6 { animation-delay: 2s; }
+  @keyframes litkey { 0%,84%,100% { background: var(--card); color: var(--ink-soft); transform: translateY(0); border-color: var(--line); } 8%,12% { background: var(--sun); color: #4A3A00; transform: translateY(3px); border-color: var(--sun); } }
+
+  /* orbiting camera */
+  .orbit { position: relative; width: 190px; height: 130px; }
+  .plate { position: absolute; left: 50%; top: 58%; width: 120px; height: 60px; transform: translate(-50%,-50%) rotateX(55deg) rotate(45deg); transform-style: preserve-3d; background: var(--grass); border-radius: 8px; box-shadow: 0 10px 0 color-mix(in srgb, var(--grass) 60%, #000); }
+  .cam-orbit { position: absolute; inset: 0; animation: spin 6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .cam { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); font-size: 26px; }
+
+  /* explorer tree */
+  .tree { text-align: left; font-weight: 700; width: 100%; max-width: 320px; }
+  .tree .row { padding: 7px 12px; border-radius: 9px; display: flex; align-items: center; gap: 8px; font-size: .95rem; }
+  .tree .row.child { margin-left: 22px; font-weight: 600; color: var(--ink-soft); }
+  .tree .row.hi { background: var(--sun-soft); animation: glowrow 2.6s ease-in-out infinite; }
+  @keyframes glowrow { 0%,100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 3px var(--sun); } }
+
+  /* dropping block */
+  .dropzone { position: relative; width: 100%; height: 150px; }
+  .floor { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); width: 220px; height: 16px; border-radius: 8px; background: var(--grass); box-shadow: 0 6px 0 color-mix(in srgb, var(--grass) 55%, #000); }
+  .dblock { position: absolute; bottom: 30px; left: 50%; margin-left: -26px; width: 52px; height: 52px; border-radius: 12px; background: var(--coral); box-shadow: var(--shadow); animation: drop 2.8s cubic-bezier(.3,1.4,.5,1) infinite; }
+  @keyframes drop { 0% { transform: translateY(-140px); opacity: 0; } 20% { opacity: 1; } 45% { transform: translateY(0); } 55% { transform: translateY(-16px); } 68% { transform: translateY(0); } 100% { transform: translateY(0); opacity: 1; } }
+
+  /* move arrows */
+  .movecube { position: relative; width: 64px; height: 64px; border-radius: 14px; background: var(--grape); box-shadow: var(--shadow); animation: liftcube 3s ease-in-out infinite; }
+  @keyframes liftcube { 0%,100% { transform: translateY(20px); } 50% { transform: translateY(-24px); } }
+  .arrow-up { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 22px solid var(--grass); }
+  .arrow-stem { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); width: 6px; height: 18px; background: var(--grass); border-radius: 3px; }
+
+  /* color cycle block */
+  .chameleon { width: 66px; height: 66px; border-radius: 14px; box-shadow: var(--shadow); animation: hue 4s steps(1) infinite; }
+  @keyframes hue { 0% { background: var(--coral); } 20% { background: var(--sky); } 40% { background: var(--grass); } 60% { background: var(--sun); } 80% { background: var(--grape); } 100% { background: var(--coral); } }
+
+  /* play avatar */
+  .playrun { position: relative; width: 100%; height: 130px; }
+  .runner { position: absolute; bottom: 24px; left: 0; font-size: 34px; animation: runacross 3.4s ease-in-out infinite; }
+  @keyframes runacross { 0% { left: 5%; } 60% { left: 62%; } 70% { left: 62%; transform: translateY(-26px); } 80% { left: 62%; transform: translateY(0); } 100% { left: 5%; } }
+  .goalblock { position: absolute; bottom: 24px; right: 18%; width: 46px; height: 46px; border-radius: 11px; background: var(--coral); box-shadow: 0 0 22px var(--coral); animation: pulseglow 1.8s ease-in-out infinite; }
+  @keyframes pulseglow { 0%,100% { box-shadow: 0 0 14px var(--coral); } 50% { box-shadow: 0 0 30px var(--coral); } }
+  .ground-line { position: absolute; bottom: 20px; left: 0; right: 0; height: 6px; background: var(--grass); border-radius: 3px; }
+
+  /* your turn */
+  .yourturn { background: var(--grass-soft); border: 2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius: 16px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; }
+  .yourturn .txt { flex: 1; }
+  .yourturn .kick { font-weight: 900; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: var(--grass); display: block; margin-bottom: 2px; }
+  .yourturn .txt p { margin: 0; color: var(--ink); font-weight: 600; font-size: .98rem; }
+  .didit { flex: none; border: none; cursor: pointer; font-family: inherit; font-weight: 900; font-size: .95rem; color: #fff; background: var(--grass); padding: 12px 18px; border-radius: 999px; box-shadow: 0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition: transform .1s, background .2s; white-space: nowrap; }
+  .didit:hover { transform: translateY(-2px); }
+  .didit:active { transform: translateY(2px); box-shadow: 0 1px 0 color-mix(in srgb, var(--grass) 55%, #000); }
+  .didit.done { background: var(--ink-faint); box-shadow: 0 4px 0 rgba(0,0,0,.2); cursor: default; }
+  .didit.done::before { content: "✓ "; }
+
+  /* brain snack */
+  .snack { background: var(--sun-soft); border: 2px solid color-mix(in srgb, var(--sun) 45%, var(--line)); border-radius: 16px; padding: 14px 18px; margin: 16px 0; }
+  .snack .h { font-weight: 900; font-size: .85rem; letter-spacing: .04em; color: #8a6a00; margin-bottom: 4px; }
+  @media (prefers-color-scheme: dark){ .snack .h { color: var(--sun); } }
+  :root[data-theme="dark"] .snack .h { color: var(--sun); }
+  .snack p { margin: 0; font-size: .96rem; color: var(--ink-soft); font-weight: 500; }
+
+  /* celebration */
+  .celebrate { text-align: center; background: linear-gradient(180deg, var(--grape-soft), var(--card)); border-color: color-mix(in srgb, var(--grape) 40%, var(--line)); position: relative; }
+  .celebrate.locked { opacity: .5; filter: grayscale(.6); }
+  .celebrate h2 { font-size: clamp(1.6rem,5vw,2.4rem); margin: 0 0 6px; }
+  .badge { width: 120px; height: 120px; margin: 8px auto 4px; display: grid; place-items: center; font-size: 62px; background: var(--sun); border-radius: 50%; box-shadow: var(--shadow-lg); border: 5px solid #fff; }
+  .celebrate.unlocked .badge { animation: pop 0.6s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes pop { 0% { transform: scale(0) rotate(-40deg); } 100% { transform: scale(1) rotate(0); } }
+  .locktext { font-weight: 700; color: var(--ink-faint); font-size: .95rem; }
+
+  /* quiz flip cards */
+  .quizgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px){ .quizgrid { grid-template-columns: 1fr; } }
+  .flip { background: transparent; perspective: 1000px; min-height: 150px; border: none; padding: 0; cursor: pointer; font-family: inherit; }
+  .flip-inner { position: relative; width: 100%; height: 100%; min-height: 150px; transition: transform .5s; transform-style: preserve-3d; }
+  .flip.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: center; text-align: left; border: 2px solid var(--line); }
+  .flip-front { background: var(--sky-soft); }
+  .flip-front .q { font-weight: 800; font-size: 1.02rem; }
+  .flip-front .tap { margin-top: auto; font-size: .8rem; color: var(--ink-faint); font-weight: 700; }
+  .flip-back { background: var(--grass-soft); transform: rotateY(180deg); }
+  .flip-back .a { font-weight: 600; font-size: .95rem; color: var(--ink); }
+
+  /* tomorrow */
+  .tomorrow { text-align: center; background: var(--ink); color: #fff; border: none; }
+  .tomorrow .eyebrow { color: var(--sun); }
+  .tomorrow h2 { color: #fff; margin: 6px 0; }
+  .tomorrow p { color: #cfc8dd; max-width: 34ch; margin: 0 auto; }
+  .mystery { font-size: 48px; animation: mysterypulse 1.6s ease-in-out infinite; }
+  @keyframes mysterypulse { 0%,100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.15); opacity: 1; } }
+
+  .parent-note { font-size: .82rem; color: var(--ink-faint); text-align: center; max-width: 60ch; margin: 20px auto 60px; padding: 0 20px; }
+  .parent-note b { color: var(--ink-soft); }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+  :where(button):focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+</style>
+
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="index.html" class="homebtn" aria-label="Back to Builder School home">🏠</a>
+    <span class="daychip">🎮 Day 1</span>
+    <div class="xp-wrap"><div class="xp-fill" id="xpfill"></div></div>
+    <span class="xp-label"><b id="xpcount">0</b>/8 ⭐</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-scene" id="heroScene" aria-hidden="true"></div>
+    <div class="eyebrow">Roblox Builder School</div>
+    <h1>You Are Now a <span class="pop">World Builder</span></h1>
+    <p class="hook">Today you stop just playing Roblox. Today you build a world you can walk around inside.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- MEET FUNDI -->
+  <div class="card meet">
+    <svg class="fundi bob" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h3>Meet Fundi, your building buddy 🐦</h3>
+      <p>Fundi is a weaver bird. Weaver birds build those amazing round nests you see hanging in acacia trees, one blade of grass at a time. Nobody teaches them from a book. They just start. That is exactly how you will build games. <span class="say">"Kidogo kidogo... one block at a time."</span></p>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">1</span><span class="lab">Open the workshop</span></div>
+    <h2>Open the magic workshop</h2>
+    <p>Normal Roblox is like watching a football match at the stadium. Roblox <b>Studio</b> is like being the person who built the stadium. Same game, but now you are on the builder's side. When it opens, click <b>Baseplate</b>. That is just a big empty piece of flat ground, like a plot of land before anyone builds on it.</p>
+    <div class="stage">
+      <div style="display:flex; gap:26px; align-items:center; font-weight:800; text-align:center;">
+        <div><div style="font-size:44px;">🎮</div><div style="font-size:.8rem; color:var(--ink-faint);">PLAY the games</div></div>
+        <div style="font-size:28px; color:var(--sky);">➜</div>
+        <div><div style="font-size:44px;">🛠️</div><div style="font-size:.8rem; color:var(--sky);">MAKE the games<br>you are here!</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Open Roblox Studio and click "Baseplate". That is it. You are officially inside the workshop.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">2</span><span class="lab">Learn to fly</span></div>
+    <h2>Learn to fly around your world</h2>
+    <p>In Studio you are like a bird in the sky, looking down at your plot. To fly: hold the <b>right mouse button</b> and move the mouse to look around. The <b>W A S D</b> keys move you around. <b>E</b> goes up, <b>Q</b> goes down. Scroll the wheel to zoom.</p>
+    <div class="stage">
+      <div class="keys">
+        <span class="keycap lit k1">W</span><span class="keycap lit k2">A</span><span class="keycap lit k3">S</span>
+        <span class="keycap lit k4">D</span><span class="keycap lit k5">E</span><span class="keycap lit k6">Q</span>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Fly one full circle around your baseplate. Zoom out until it looks tiny, then dive down close to the ground.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: The camera is not you</div>
+      <p>Flying around only changes what you are LOOKING at. It never breaks anything. It is like walking around a building site to inspect it. So fly anywhere, as fast as you want. You are safe.</p>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">3</span><span class="lab">The Explorer</span></div>
+    <h2>The Explorer: your game's register</h2>
+    <p>On the right is a panel called <b>Explorer</b>. It is the list of EVERYTHING in your game. Think of the school register: if your name is not on it, you are not in the class. Same here. If something is not in the Explorer, it is not in your game. Click the little arrows to unfold folders inside folders. Builders call this a "tree" because it branches like one.</p>
+    <div class="stage">
+      <div class="tree">
+        <div class="row">🎮 <b>Game</b></div>
+        <div class="row child hi">📦 Workspace <span style="font-size:.75rem; color:var(--sky);">← the world</span></div>
+        <div class="row child">👥 Players</div>
+        <div class="row child">💡 Lighting</div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Find "Workspace" in the Explorer and click its little arrow to open it. Peek at what is inside.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Everything lives somewhere</div>
+      <p>Every block, every sword, every zombie has its name in the Explorer, sitting inside something else. Nothing floats around loose. When you get lost later (everyone does), check the register first. It is your map.</p>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">4</span><span class="lab">The Workspace</span></div>
+    <h2>The Workspace: where the real world lives</h2>
+    <p>The Explorer lists many things, but one matters most today: <b>Workspace</b>. It holds the actual 3D world, the part players can see and touch. Think of a market: the Workspace is the stalls out front where customers walk. The other items are the storeroom at the back. Real, but customers never see them.</p>
+    <div class="stage">
+      <div style="text-align:center;">
+        <div style="font-weight:800; margin-bottom:8px;">The list <span style="color:var(--sky);">IS</span> the world</div>
+        <div style="display:flex; gap:16px; align-items:center; justify-content:center;">
+          <div class="tree" style="max-width:150px;"><div class="row hi">📦 Baseplate</div></div>
+          <div style="font-size:22px;">🔗</div>
+          <div class="floor" style="position:static; transform:none; width:120px; height:40px; border-radius:8px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Inside Workspace, click "Baseplate". Watch the giant floor in the 3D world get a blue glow. You just proved the list and the world are connected!</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">5</span><span class="lab">Your first block</span></div>
+    <h2>Drop your very first block 🧱</h2>
+    <p>Big moment. In Roblox, almost everything is built from <b>Parts</b>. A Part is one solid block, like one brick in a wall. Whole castles and cars are just many Parts stacked cleverly. At the top of Studio, in the Home tab, find the <b>Part</b> button and click it. A grey block appears! And look, a new name "Part" pops up in the Explorer. You put it on the register.</p>
+    <div class="stage">
+      <div class="dropzone">
+        <div class="dblock"></div>
+        <div class="floor"></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Click the Part button. Then click your block and drag it somewhere else. That block is YOURS now.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Big things are just small things stacked</div>
+      <p>That giant castle in your favorite game is not one magic object. It is hundreds of simple Parts, placed one at a time, by a person like you. Just like Fundi's nest. Kidogo kidogo.</p>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">6</span><span class="lab">Move it like a pro</span></div>
+    <h2>Move it like a pro</h2>
+    <p>Dragging is fine, but pros use the <b>Move tool</b>. Click your Part and switch on the Move tool. Colored arrows appear: red, green, and blue. Each arrow moves the block in ONE straight direction, like pushing a wheelbarrow on a straight path so it cannot wander sideways. This is how builders place things EXACTLY where they want.</p>
+    <div class="stage">
+      <div class="movecube"><div class="arrow-stem"></div><div class="arrow-up"></div></div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Use the green arrow to lift your block up into the air. Yes, it just floats there. In YOUR world, you decide if things float.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">7</span><span class="lab">Paint it</span></div>
+    <h2>Paint it and change what it is made of 🎨</h2>
+    <p>A grey block is boring. Click your Part, then find two magic buttons at the top. <b>Color</b> opens a box of colors, like choosing paint at the hardware shop. <b>Material</b> changes what the block is MADE of: grass, wood, metal, glass, or glowing neon. Same shape, totally different feeling.</p>
+    <div class="stage">
+      <div class="chameleon"></div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Make one block bright red neon. Then make a second Part (you know how now!) and turn it into grass or wood. Two blocks, two totally different vibes.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Try it, look, change it</div>
+      <p>Real builders try a color, look, and change it again. Nothing is wasted. And <b>Ctrl + Z</b> undoes your last move, like a magic eraser. You literally cannot ruin anything, so experiment like crazy.</p>
+    </div>
+  </section>
+
+  <!-- STEP 8 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">8</span><span class="lab">Press play</span></div>
+    <h2>Press Play and walk in your own world 🏃</h2>
+    <p>Best part. Find the big <b>Play</b> button at the top and press it. Studio drops YOUR avatar into YOUR world. You are not the bird in the sky anymore. You are a player, standing on ground you built, walking past blocks you placed and painted. Every Roblox game you love started exactly like this. Press the red <b>Stop</b> button to go back to builder mode.</p>
+    <div class="stage">
+      <div class="playrun">
+        <div class="ground-line"></div>
+        <div class="goalblock"></div>
+        <div class="runner">🏃</div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span><p>Press Play. Walk to your neon block and jump on it. Then press Stop to come back to builder mode.</p></div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- CELEBRATION -->
+  <section class="card celebrate locked" id="celebrate">
+    <div class="badge" id="badge">🔒</div>
+    <h2 id="celebTitle">Finish all 8 steps to earn your badge</h2>
+    <p id="celebText" class="locktext">Tick off each "I did it!" as you go. Your Day 1 Builder Badge is waiting.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section>
+    <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it. No pressure, just checking your brain caught it.</p>
+    <div class="quizgrid">
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is the Explorer?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">The list of everything in your game, like a school register. Not on the list = not in the game.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is special about the Workspace?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">It holds the real 3D world players can see and walk in. The stalls out front, not the storeroom.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is a Part?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">One solid block, the basic building stone of Roblox. Big things are just many Parts stacked together.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">You deleted the wrong thing. What saves you?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Ctrl + Z, the magic undo. Builders change things without fear because undo has their back.</div></div></div></button>
+    </div>
+  </section>
+
+  <!-- TOMORROW -->
+  <section class="card tomorrow">
+    <div class="eyebrow">🔮 Tomorrow · Day 2</div>
+    <div class="mystery">🧱❓</div>
+    <h2>You build a block that KNOWS when you touch it</h2>
+    <p>Your world stops being quiet and starts to react to you. Your very first piece of real code.</p>
+  </section>
+
+  <p class="parent-note">
+    <b>For the parent:</b> this is Day 1 of the bootcamp, built for a 10-year-old to do mostly on their own. After he finishes, do the 15-minute check-in: ask him to <b>show you</b> his world and <b>change one block's color live</b> in front of you. Note: Roblox Studio moves buttons around between versions, so if a button is not exactly where the lesson says, help him find it once by name (for example the "Part" button in the Home tab). That is the only spot where a real screenshot from your own Studio would help.
+  </p>
+
+</main>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // hero falling blocks
+    var scene = document.getElementById('heroScene');
+    if (scene && !reduce) {
+      var colors = ['#FF5A47', '#2E9BF0', '#2FB35C', '#FFC531', '#8B5CF6'];
+      for (var i = 0; i < 9; i++) {
+        var b = document.createElement('div');
+        b.className = 'fall';
+        b.style.left = (6 + i * 11) + '%';
+        b.style.background = colors[i % colors.length];
+        b.style.animationDelay = (i * 0.38) + 's';
+        scene.appendChild(b);
+      }
+    }
+
+    // progress (saved in this browser so he never loses it)
+    var DAY = 'day1';
+    var steps = document.querySelectorAll('[data-step]');
+    var total = steps.length;
+    var done = 0;
+    var fill = document.getElementById('xpfill');
+    var count = document.getElementById('xpcount');
+    var celebrate = document.getElementById('celebrate');
+    var badge = document.getElementById('badge');
+    var celebTitle = document.getElementById('celebTitle');
+    var celebText = document.getElementById('celebText');
+
+    function loadProgress() {
+      try { return JSON.parse(localStorage.getItem('rbs_progress') || '{}'); } catch (e) { return {}; }
+    }
+    function saveProgress(p) {
+      try { localStorage.setItem('rbs_progress', JSON.stringify(p)); } catch (e) {}
+    }
+    function recordStep(idx) {
+      var p = loadProgress();
+      p[DAY] = p[DAY] || { steps: [], done: false };
+      if (p[DAY].steps.indexOf(idx) === -1) p[DAY].steps.push(idx);
+      if (p[DAY].steps.length >= total) p[DAY].done = true;
+      saveProgress(p);
+    }
+
+    steps.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('done')) return;
+        markDone(btn, idx, true);
+        recordStep(idx);
+        smallPop(btn);
+        if (done === total) finish(true);
+      });
+    });
+
+    function markDone(btn, idx, animate) {
+      btn.classList.add('done');
+      btn.textContent = 'Done!';
+      done++;
+      fill.style.width = Math.round((done / total) * 100) + '%';
+      count.textContent = done;
+    }
+
+    // restore saved ticks on load
+    (function restore() {
+      var p = loadProgress();
+      var saved = (p[DAY] && p[DAY].steps) || [];
+      steps.forEach(function (btn, idx) {
+        if (saved.indexOf(idx) !== -1) markDone(btn, idx, false);
+      });
+      if (done === total) finish(false);
+    })();
+
+    function finish(animate) {
+      celebrate.classList.remove('locked');
+      celebrate.classList.add('unlocked');
+      badge.textContent = '🪺';
+      celebTitle.textContent = 'YOU DID IT! Day 1 Builder Badge earned 🎉';
+      celebText.className = '';
+      celebText.textContent = 'This morning this world did not exist. Now there is a place with your blocks, your colors, and your floating neon light, and you can walk around inside it. You used the real tools. Fundi says this nest is strong. See you on Day 2!';
+      var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
+      if (animate) {
+        celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+        if (!reduce) confettiBurst();
+      }
+    }
+
+    function smallPop(el) {
+      if (reduce) return;
+      el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' });
+    }
+
+    // quiz flip
+    document.querySelectorAll('.flip').forEach(function (f) {
+      f.addEventListener('click', function () { f.classList.toggle('flipped'); });
+    });
+
+    // confetti
+    function confettiBurst() {
+      var cv = document.getElementById('confetti');
+      var ctx = cv.getContext('2d');
+      var W = cv.width = window.innerWidth, H = cv.height = window.innerHeight;
+      var cols = ['#FF5A47', '#2E9BF0', '#2FB35C', '#FFC531', '#8B5CF6'];
+      var bits = [];
+      for (var i = 0; i < 140; i++) {
+        bits.push({ x: W / 2, y: H / 3, vx: (Math.random() - 0.5) * 14, vy: Math.random() * -15 - 4, s: 6 + Math.random() * 8, c: cols[i % cols.length], r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4 });
+      }
+      var t = 0;
+      function frame() {
+        ctx.clearRect(0, 0, W, H);
+        t++;
+        bits.forEach(function (p) {
+          p.vy += 0.4; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+          ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s); ctx.restore();
+        });
+        if (t < 160) requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
+      }
+      frame();
+    }
+  })();
+</script>
