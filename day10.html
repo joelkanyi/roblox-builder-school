@@ -158,6 +158,12 @@
 
   #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
   :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+  .shot { margin:8px 0 16px; border:2px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
+  .shot img { display:block; width:100%; height:auto; }
+  .shot figcaption { font-size:.82rem; color:var(--ink-faint); font-weight:600; padding:9px 14px; text-align:center; }
+  .shot.pending { border-style:dashed; border-color:color-mix(in srgb, var(--sky) 45%, var(--line)); }
+  .shot.pending img { display:none; }
+  .shot.pending::before { content:"\1F4F8  Screenshot goes here: " attr(data-file); display:block; padding:26px 14px; text-align:center; color:var(--ink-faint); font-weight:800; font-size:.85rem; background:var(--sun-soft); }
 </style>
 
 <canvas id="confetti"></canvas>
@@ -239,6 +245,10 @@
     <div class="step-num"><span class="n">2</span><span class="lab">Make the button</span></div>
     <h2>Add a ScreenGui, then a TextButton</h2>
     <p>Screen things live in a place called <b>StarterGui</b>. First you add a holder called a <b>ScreenGui</b>. A ScreenGui is just a box that holds screen things. Then you put a <b>TextButton</b> inside it. A TextButton is a button with words on it.</p>
+    <figure class="shot" data-file="images/day10-screengui.png">
+      <img src="images/day10-screengui.png" alt="StarterGui with a ScreenGui and TextButton in the Explorer" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: StarterGui holds a ScreenGui, which holds your TextButton.</figcaption>
+    </figure>
     <div class="stage">
       <div class="treebox good" style="max-width:320px;">
         <div class="cap">✅ How it should look</div>

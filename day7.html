@@ -158,6 +158,12 @@
 
   #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
   :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+  .shot { margin:8px 0 16px; border:2px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
+  .shot img { display:block; width:100%; height:auto; }
+  .shot figcaption { font-size:.82rem; color:var(--ink-faint); font-weight:600; padding:9px 14px; text-align:center; }
+  .shot.pending { border-style:dashed; border-color:color-mix(in srgb, var(--sky) 45%, var(--line)); }
+  .shot.pending img { display:none; }
+  .shot.pending::before { content:"\1F4F8  Screenshot goes here: " attr(data-file); display:block; padding:26px 14px; text-align:center; color:var(--ink-faint); font-weight:800; font-size:.85rem; background:var(--sun-soft); }
 </style>
 
 <canvas id="confetti"></canvas>
@@ -230,6 +236,10 @@
     <div class="step-num"><span class="n">2</span><span class="lab">The backstage brain</span></div>
     <h2>Add a Script in ServerScriptService</h2>
     <p>The scoreboard is a game rule, not a block rule. Game rules live in a special place called <b>ServerScriptService</b>. Think of it as the game's <b>backstage brain</b>. The player never sees it. The game keeps its own rules there. We put our scoreboard code inside it.</p>
+    <figure class="shot" data-file="images/day7-serverscriptservice.png">
+      <img src="images/day7-serverscriptservice.png" alt="A Script inside ServerScriptService in the Explorer" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: the scoreboard Script goes inside ServerScriptService.</figcaption>
+    </figure>
     <div class="stage">
       <div class="treecmp">
         <div class="treebox good">
@@ -333,6 +343,10 @@ Players.PlayerAdded:<span class="fn">Connect</span>(<span class="kw">function</s
     <div class="step-num"><span class="n">5</span><span class="lab">See it</span></div>
     <h2>Press Play. See "Wins 0" in the top-right</h2>
     <p>Time to look. Press <b>Play</b>. Look at the <b>top-right corner</b> of the screen. You should see your name and, next to it, <b>Wins</b> with a <b>0</b>. That is your scoreboard, alive! It is 0 because nobody has finished yet. That is correct.</p>
+    <figure class="shot" data-file="images/day7-scoreboard.png">
+      <img src="images/day7-scoreboard.png" alt="The in-game scoreboard in the top-right showing Wins 0" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: the Wins scoreboard in the top-right corner.</figcaption>
+    </figure>
     <div class="stage">
       <div class="treebox good" style="max-width:280px; margin:0 auto;">
         <div class="cap" style="color:var(--ink-soft);">📺 Top-right of your screen</div>

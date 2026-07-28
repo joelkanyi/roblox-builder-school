@@ -158,6 +158,12 @@
 
   #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
   :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+  .shot { margin:8px 0 16px; border:2px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
+  .shot img { display:block; width:100%; height:auto; }
+  .shot figcaption { font-size:.82rem; color:var(--ink-faint); font-weight:600; padding:9px 14px; text-align:center; }
+  .shot.pending { border-style:dashed; border-color:color-mix(in srgb, var(--sky) 45%, var(--line)); }
+  .shot.pending img { display:none; }
+  .shot.pending::before { content:"\1F4F8  Screenshot goes here: " attr(data-file); display:block; padding:26px 14px; text-align:center; color:var(--ink-faint); font-weight:800; font-size:.85rem; background:var(--sun-soft); }
 </style>
 
 <canvas id="confetti"></canvas>
@@ -234,6 +240,10 @@
     <h2>Add a SpawnLocation for the flag</h2>
     <p>Here is the most important rule of the whole day. A checkpoint is NOT a normal Part. It must be a special part called a <b>SpawnLocation</b>. A SpawnLocation is a "start here" pad. Roblox already knows how to bring players back to one. A normal Part cannot do that. So we must use the right kind of part.</p>
     <p class="typehint">Careful: it must be a <b>SpawnLocation</b>, not a plain Part. A normal Part will NOT work as a checkpoint.</p>
+    <figure class="shot" data-file="images/day5-spawnlocation.png">
+      <img src="images/day5-spawnlocation.png" alt="Inserting a SpawnLocation in the Explorer" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: a SpawnLocation (not a plain Part) is your checkpoint.</figcaption>
+    </figure>
     <div class="stage">
       <div class="treecmp">
         <div class="treebox good">

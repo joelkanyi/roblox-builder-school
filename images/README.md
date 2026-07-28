@@ -16,7 +16,7 @@ Rename it to the filename in the list, then move it into this `images/` folder.
 | `day2-script-in-part.png` | The **Explorer** panel showing a `Script` sitting inside a `Part` |
 | `day2-output.png` | The **Output** window after running `print("hello")`, showing the word hello |
 
-## Not wired yet (say the word and I add the slots)
+## Also wired now (Days 5, 7, 10)
 
 | Filename | What to capture |
 |---|---|
