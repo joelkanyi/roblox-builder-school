@@ -1,0 +1,478 @@
+<title>Day 10 · A Button on Screen</title>
+<style>
+  :root {
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun:#FFC531; --sky:#2E9BF0; --grass:#2FB35C; --coral:#FF5A47; --grape:#8B5CF6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r:22px; --maxw:880px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+      --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+      --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+  }
+  :root[data-theme="light"] { --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10); --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16); }
+  :root[data-theme="dark"] { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+    --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:18px; overflow-x:hidden; }
+  .mono { font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+
+  .topbar { position:sticky; top:0; z-index:60; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(8px); border-bottom:2px solid var(--line); }
+  .topbar .wrap { display:flex; align-items:center; gap:14px; height:58px; }
+  .homebtn { flex:none; width:40px; height:40px; border-radius:12px; background:var(--card); border:2px solid var(--line); display:grid; place-items:center; text-decoration:none; font-size:18px; }
+  .homebtn:hover { border-color:var(--sky); }
+  .daychip { font-weight:800; font-size:15px; background:var(--grape); color:#fff; padding:5px 12px; border-radius:999px; white-space:nowrap; }
+  .xp-wrap { flex:1; height:16px; background:var(--line); border-radius:999px; overflow:hidden; }
+  .xp-fill { height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--grape),var(--coral)); transition:width .5s cubic-bezier(.2,.9,.3,1.2); }
+  .xp-label { font-weight:800; font-size:14px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .xp-label b { color:var(--grape); }
+
+  .hero { position:relative; padding:38px 0 16px; text-align:center; }
+  .hero-block { width:88px; height:88px; margin:0 auto 6px; border-radius:18px; background:#8a8f9c; box-shadow:var(--shadow-lg); position:relative; animation:wake 4s ease-in-out infinite; }
+  @keyframes wake { 0%,55%{ background:#8a8f9c; transform:scale(1);} 65%{ background:var(--coral); transform:scale(1.12);} 85%{ background:var(--coral);} 100%{ background:#8a8f9c;} }
+  .hero-block .zzz { position:absolute; top:-22px; right:-8px; font-size:20px; animation:zzz 4s ease-in-out infinite; }
+  @keyframes zzz { 0%,50%{ opacity:1;} 60%,100%{ opacity:0;} }
+  .hero-block .spark { position:absolute; inset:0; display:grid; place-items:center; font-size:34px; opacity:0; animation:spark 4s ease-in-out infinite; }
+  @keyframes spark { 0%,58%{ opacity:0; transform:scale(.4);} 66%{ opacity:1; transform:scale(1);} 84%{ opacity:1;} 90%,100%{ opacity:0;} }
+  .eyebrow { font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--grape); font-size:13px; }
+  h1 { font-size:clamp(2rem,6.5vw,3.2rem); line-height:1.02; margin:8px 0 0; font-weight:900; letter-spacing:-.02em; text-wrap:balance; }
+  h1 .pop { color:var(--coral); }
+  .hook { font-size:clamp(1.05rem,2.6vw,1.28rem); color:var(--ink-soft); max-width:32ch; margin:14px auto 0; font-weight:600; }
+
+  section { padding:14px 0; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; margin:16px 0; }
+
+  .fundi { width:88px; height:88px; flex:none; animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+  .meet { display:flex; gap:18px; align-items:center; background:var(--sun-soft); border-color:color-mix(in srgb, var(--sun) 40%, var(--line)); }
+  .meet h3 { margin:0 0 4px; font-size:1.2rem; }
+  .meet p { margin:0; font-size:.95rem; color:var(--ink-soft); }
+  .meet .say { font-weight:800; color:#8a6a00; }
+  @media (prefers-color-scheme: dark){ .meet .say{ color:var(--sun);} }
+  :root[data-theme="dark"] .meet .say { color:var(--sun); }
+
+  .step-num { display:inline-flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .step-num .n { width:40px; height:40px; border-radius:12px; background:var(--grape); color:#fff; font-weight:900; font-size:20px; display:grid; place-items:center; box-shadow:var(--shadow); }
+  .step-num .lab { font-weight:800; letter-spacing:.1em; text-transform:uppercase; font-size:12px; color:var(--ink-faint); }
+  .step h2 { font-size:clamp(1.35rem,4vw,1.85rem); margin:2px 0 10px; font-weight:900; letter-spacing:-.01em; text-wrap:balance; }
+  .step p { margin:0 0 12px; color:var(--ink-soft); font-weight:500; }
+  .step p b, .step li b { color:var(--ink); }
+
+  .stage { background:linear-gradient(180deg,var(--grape-soft),transparent); border:2px dashed color-mix(in srgb, var(--grape) 35%, var(--line)); border-radius:16px; min-height:150px; display:grid; place-items:center; margin:8px 0 16px; padding:18px; overflow:hidden; }
+
+  /* code box (always dark, like a real editor) */
+  .code { position:relative; background:#191527; border:2px solid #2c2740; border-radius:14px; margin:6px 0 14px; overflow-x:auto; box-shadow:var(--shadow); }
+  .code .bar { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid #2c2740; }
+  .code .bar i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .code pre { margin:0; padding:16px 18px; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:15px; line-height:1.7; color:#EDE9FA; white-space:pre; }
+  .code .kw { color:#FF8FB0; } .code .fn { color:#7FD1FF; } .code .str { color:#8CE0B0; } .code .num { color:#FFC96B; } .code .cm { color:#8B84A0; }
+  .code.new { border-color:var(--grape); box-shadow:0 0 0 3px color-mix(in srgb, var(--grape) 25%, transparent); }
+  .newtag { position:absolute; top:-11px; right:14px; background:var(--grape); color:#fff; font-weight:800; font-size:10.5px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; }
+  .typehint { font-size:.82rem; color:var(--ink-faint); font-weight:600; margin:-6px 0 12px; }
+  .typehint b { color:var(--coral); }
+
+  .keycap { display:inline-grid; place-items:center; min-width:26px; height:26px; padding:0 6px; border-radius:7px; background:var(--card); border:1.5px solid var(--line); border-bottom-width:3px; font-weight:900; font-size:13px; font-family:ui-monospace,monospace; color:var(--ink-soft); vertical-align:middle; }
+
+  /* when-do panels */
+  .wd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .wd .panel { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px 18px; text-align:center; min-width:120px; box-shadow:var(--shadow); }
+  .wd .panel .t { font-weight:900; font-size:11px; letter-spacing:.1em; color:var(--ink-faint); }
+  .wd .panel .e { font-size:34px; }
+  .wd .arrow { font-size:26px; color:var(--grape); font-weight:900; }
+  .wd .when .t { color:var(--sky); } .wd .do .t { color:var(--coral); }
+
+  /* explorer tick/x */
+  .treecmp { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; }
+  .treebox { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px; flex:1; min-width:200px; }
+  .treebox.good { border-color:var(--grass); } .treebox.bad { border-color:var(--coral); }
+  .treebox .cap { font-weight:900; font-size:.85rem; margin-bottom:8px; }
+  .treebox.good .cap { color:var(--grass); } .treebox.bad .cap { color:var(--coral); }
+  .trow { padding:5px 8px; font-weight:700; font-size:.9rem; }
+  .trow.ind1 { margin-left:16px; color:var(--ink-soft); } .trow.ind2 { margin-left:34px; color:var(--ink-soft); }
+
+  .yourturn { background:var(--grass-soft); border:2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius:16px; padding:16px 18px; display:flex; gap:14px; align-items:center; }
+  .yourturn .txt { flex:1; } .yourturn .txt p { margin:0; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt ol { margin:2px 0 0; padding-left:22px; }
+  .yourturn .txt li { margin-bottom:5px; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt .after { margin:6px 0 0; color:var(--grass); font-weight:800; font-size:.95rem; }
+  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:4px; }
+  .didit { flex:none; border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:.95rem; color:#fff; background:var(--grass); padding:12px 18px; border-radius:999px; box-shadow:0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition:transform .1s, background .2s; white-space:nowrap; }
+  .didit:hover { transform:translateY(-2px); } .didit:active { transform:translateY(2px); }
+  .didit.done { background:var(--ink-faint); box-shadow:0 4px 0 rgba(0,0,0,.2); cursor:default; }
+  .didit.done::before { content:"✓ "; }
+
+  .snack { background:var(--sun-soft); border:2px solid color-mix(in srgb, var(--sun) 45%, var(--line)); border-radius:16px; padding:14px 18px; margin:16px 0; }
+  .snack .h { font-weight:900; font-size:.85rem; letter-spacing:.04em; color:#8a6a00; margin-bottom:4px; }
+  @media (prefers-color-scheme: dark){ .snack .h{ color:var(--sun);} }
+  :root[data-theme="dark"] .snack .h { color:var(--sun); }
+  .snack p { margin:0; font-size:.96rem; color:var(--ink-soft); font-weight:500; }
+
+  /* troubleshooter */
+  .trouble { background:var(--coral-soft); border:2px solid color-mix(in srgb, var(--coral) 40%, var(--line)); border-radius:16px; padding:6px 18px; margin:14px 0; }
+  .trouble summary { cursor:pointer; font-weight:900; padding:12px 0; list-style:none; color:var(--coral); }
+  .trouble summary::-webkit-details-marker { display:none; }
+  .trouble summary::before { content:"🔧 "; }
+  .trouble ol { margin:0 0 14px; padding-left:22px; color:var(--ink); font-weight:500; font-size:.95rem; }
+  .trouble li { margin-bottom:8px; }
+  .trouble b { color:var(--ink); }
+
+  .celebrate { text-align:center; background:linear-gradient(180deg,var(--grape-soft),var(--card)); border-color:color-mix(in srgb, var(--grape) 40%, var(--line)); }
+  .celebrate.locked { opacity:.5; filter:grayscale(.6); }
+  .celebrate h2 { font-size:clamp(1.5rem,5vw,2.2rem); margin:0 0 6px; }
+  .badge { width:120px; height:120px; margin:8px auto 4px; display:grid; place-items:center; font-size:60px; background:var(--grape); border-radius:50%; box-shadow:var(--shadow-lg); border:5px solid #fff; }
+  .celebrate.unlocked .badge { animation:pop .6s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes pop { 0%{ transform:scale(0) rotate(-40deg);} 100%{ transform:scale(1) rotate(0);} }
+  .locktext { font-weight:700; color:var(--ink-faint); font-size:.95rem; }
+
+  .quizgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:620px){ .quizgrid{ grid-template-columns:1fr;} }
+  .flip { background:transparent; perspective:1000px; min-height:160px; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--ink); }
+  .flip-inner { position:relative; width:100%; height:100%; min-height:160px; transition:transform .5s; transform-style:preserve-3d; }
+  .flip.flipped .flip-inner { transform:rotateY(180deg); }
+  .flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:16px; padding:18px; display:flex; flex-direction:column; justify-content:center; text-align:left; border:2px solid var(--line); }
+  .flip-front { background:var(--sky-soft); }
+  .flip-front .q { font-weight:800; font-size:1rem; color:var(--ink); }
+  .flip-front .tap { margin-top:auto; font-size:.8rem; color:var(--ink-faint); font-weight:700; }
+  .flip-back { background:var(--grass-soft); transform:rotateY(180deg); }
+  .flip-back .a { font-weight:600; font-size:.92rem; color:var(--ink); }
+
+  .tomorrow { text-align:center; background:#221B33; color:#fff; border:none; }
+  .tomorrow .eyebrow { color:var(--coral); }
+  .tomorrow h2 { color:#fff; margin:6px 0; }
+  .tomorrow p { color:#cfc8dd; max-width:34ch; margin:0 auto; }
+  .lava { font-size:48px; animation:lavapulse 1.4s ease-in-out infinite; }
+  @keyframes lavapulse { 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 6px var(--coral)); } 50%{ transform:scale(1.15); filter:drop-shadow(0 0 18px var(--coral)); } }
+
+  .parent-note { font-size:.82rem; color:var(--ink-faint); text-align:center; max-width:62ch; margin:20px auto 60px; padding:0 20px; }
+  .parent-note b { color:var(--ink-soft); }
+
+  #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
+  :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+</style>
+
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="index.html" class="homebtn" aria-label="Back to Builder School home">🏠</a>
+    <span class="daychip">🎛️ Day 10</span>
+    <div class="xp-wrap"><div class="xp-fill" id="xpfill"></div></div>
+    <span class="xp-label"><b id="xpcount">0</b>/6 ⭐</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-block" aria-hidden="true"><span class="zzz">👆</span><span class="spark">🔘</span></div>
+    <div class="eyebrow">Roblox Builder School</div>
+    <h1>A Button on the <span class="pop">Screen</span></h1>
+    <p class="hook">Today you make a button that sits on the screen. The player taps it, and it does something.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card meet">
+    <svg class="fundi" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h3>Karibu back, Builder! 🐦</h3>
+      <p>So far you made things in the 3D world. Blocks. Lava. Coins. But games also have things <b>on the screen</b>. A score at the top. A "Play" button. A health bar. Today Fundi shows you how to draw a button right on the screen. The player taps it, and your code runs. This is called a <b>GUI</b>. <span class="say">Twende!</span></p>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">1</span><span class="lab">What is a GUI</span></div>
+    <h2>GUI: things drawn ON the screen</h2>
+    <p>Look at any game on a phone. The buttons, the score, the words on top. Those are not in the 3D world. They float on top of the screen, like <b>stickers on your phone glass</b>. That is a <b>GUI</b>. Say it "goo-ee". It means the buttons and words you see on the screen.</p>
+    <div class="stage">
+      <div class="treecmp">
+        <div class="treebox good">
+          <div class="cap">🔘 GUI: on the screen</div>
+          <div class="trow">Button you tap</div>
+          <div class="trow">Score at the top</div>
+          <div class="trow">Health bar</div>
+        </div>
+        <div class="treebox bad" style="border-color:var(--sky);">
+          <div class="cap" style="color:var(--sky);">🧱 3D world: in the game</div>
+          <div class="trow">Blocks</div>
+          <div class="trow">Lava</div>
+          <div class="trow">Coins you walk into</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Look at a game you like.</li>
+          <li>Point at one thing on the screen (a button or the score).</li>
+          <li>Point at one thing in the 3D world (a wall or a floor).</li>
+          <li>Now you can tell them apart.</li>
+        </ol>
+        <p class="after">Screen things float on top. World things stay in the world. 🔘</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">2</span><span class="lab">Make the button</span></div>
+    <h2>Add a ScreenGui, then a TextButton</h2>
+    <p>Screen things live in a place called <b>StarterGui</b>. First you add a holder called a <b>ScreenGui</b>. A ScreenGui is just a box that holds screen things. Then you put a <b>TextButton</b> inside it. A TextButton is a button with words on it.</p>
+    <div class="stage">
+      <div class="treebox good" style="max-width:320px;">
+        <div class="cap">✅ How it should look</div>
+        <div class="trow">🖥️ StarterGui</div>
+        <div class="trow ind1">📺 ScreenGui</div>
+        <div class="trow ind2">🔘 TextButton</div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>In the Explorer, find <b>StarterGui</b>.</li>
+          <li>Put your mouse on it. Click the <b>+</b> sign.</li>
+          <li>Choose <b>ScreenGui</b>.</li>
+          <li>Put your mouse on the ScreenGui. Click <b>+</b> again.</li>
+          <li>Choose <b>TextButton</b>.</li>
+          <li>Click the button. In Properties, find <b>Text</b>. Type <span class="mono">Tap me!</span></li>
+        </ol>
+        <p class="after">A button now sits on your screen. 🎉</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: GUI is on the screen, blocks are in the world</div>
+      <p>Your blocks live in the 3D world. You walk up to them. A GUI is different. It sits flat on the screen, in front of everything, like a sticker on the glass. The player never walks to it. They just tap it.</p>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">3</span><span class="lab">A new kind of script</span></div>
+    <h2>Put a LocalScript inside the button</h2>
+    <p>Before, you used a plain <b>Script</b>. Screen buttons need a different one: a <b>LocalScript</b>. A LocalScript is code that runs on the player's <b>own screen</b>. On their phone or their computer, not on the game's backstage brain. That is perfect for buttons, because a button lives on one player's screen.</p>
+    <div class="stage">
+      <div class="treebox good" style="max-width:320px;">
+        <div class="cap">✅ LocalScript goes INSIDE the button</div>
+        <div class="trow">📺 ScreenGui</div>
+        <div class="trow ind1">🔘 TextButton</div>
+        <div class="trow ind2">📜 LocalScript</div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>In the Explorer, put your mouse on the <b>TextButton</b>.</li>
+          <li>Click the <b>+</b> sign.</li>
+          <li>Choose <b>LocalScript</b>.</li>
+          <li>Check the LocalScript sits <b>inside</b> the TextButton.</li>
+          <li>Double click it to open it. Delete everything inside.</li>
+        </ol>
+        <p class="after">Same idea as before: the note goes inside the thing it belongs to. 🐤</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">4</span><span class="lab">Write the code</span></div>
+    <h2>When the button is tapped, print a message</h2>
+    <p>Now the code, one small piece at a time. First tell the code which button is yours. Type this line:</p>
+    <div class="code new"><span class="newtag">NEW LINE</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> button = script.Parent</pre></div>
+    <p>Read it like a sentence: "<b>script</b> is me, this note. <b>Parent</b> is the thing I am tucked inside, my TextButton. Let us call it <b>button</b>."</p>
+    <p class="typehint">Careful: capital <b>P</b> in <span class="mono">Parent</span>! The computer thinks <span class="mono">parent</span> and <span class="mono">Parent</span> are two different words.</p>
+    <p>Now the WHEN and the DO. A button has an alarm called <b>MouseButton1Click</b>. It rings when the player clicks or taps the button. Add these lines under Line 1:</p>
+    <div class="code new"><span class="newtag">NEW LINES</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre>button.MouseButton1Click:<span class="fn">Connect</span>(<span class="kw">function</span>()
+    <span class="fn">print</span>(<span class="str">"You clicked the button!"</span>)
+<span class="kw">end</span>)</pre></div>
+    <p>In kid language: "Hey button! You have an alarm called <b>MouseButton1Click</b> that rings when someone taps you. When it rings, print a message." The <b>end</b> closes the box of steps.</p>
+    <p style="font-weight:700; color:var(--ink);">Your whole LocalScript is now this:</p>
+    <div class="code"><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> button = script.Parent
+
+button.MouseButton1Click:<span class="fn">Connect</span>(<span class="kw">function</span>()
+    <span class="fn">print</span>(<span class="str">"You clicked the button!"</span>)
+<span class="kw">end</span>)</pre></div>
+    <p class="typehint">Watch the big word: capital <b>M</b>, capital <b>B</b>, capital <b>C</b> in <span class="mono">MouseButton1Click</span>. And it is the number <b>1</b>, not the letter l.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Type all the lines yourself. Go slow.</li>
+          <li>Read it out loud like a story.</li>
+        </ol>
+        <p class="after">"My button is called button. When it is clicked, print a message."</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: same "when X, do Y" pattern</div>
+      <p>You already know this! On Day 2, <span class="mono">Touched</span> was the alarm for blocks. Now <span class="mono">MouseButton1Click</span> is the alarm for buttons. Different alarm, same idea: when it rings, do the steps inside. Every event in the game works this way.</p>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">5</span><span class="lab">Play it</span></div>
+    <h2>Press Play. Tap the button. Watch the Output. 🔘</h2>
+    <p>The moment. Press <b>Play</b>. You will see your button sitting on the screen. Tap it with your mouse. Then look at the <b>Output</b> window (open it from the View tab). Do you see your message? THAT WAS YOUR CODE. The button heard you.</p>
+    <div class="stage">
+      <div class="wd">
+        <div class="panel when"><div class="t">WHEN</div><div class="e">👆</div><div style="font-size:.8rem;font-weight:700;">tap the button</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel do"><div class="t">DO</div><div class="e">💬</div><div style="font-size:.8rem;font-weight:700;">print a message</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Play</b>.</li>
+          <li>Find your button on the screen. Tap it.</li>
+          <li>Look at the Output window. Do you see "You clicked the button!"?</li>
+          <li>Tap it a few more times. Watch the message come again and again.</li>
+        </ol>
+        <p class="after">You made a button that listens! 🎉</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <details class="trouble">
+      <summary>Nothing happened? Tap here, do not panic</summary>
+      <ol>
+        <li><b>Is the LocalScript INSIDE the TextButton?</b> Check the Explorer. It must sit under the button (Step 3), not next to it. If it is in the wrong place, drag it onto the button.</li>
+        <li><b>Is it a LocalScript, not a plain Script?</b> Buttons need a <b>LocalScript</b>. Look at the icon in the Explorer and make sure.</li>
+        <li><b>Look for red text in the Output.</b> Red text points at the line with the problem. Check for a tiny typo: a small letter that should be capital (<span class="mono">MouseButton1Click</span>, <span class="mono">Connect</span>, <span class="mono">Parent</span>), or the letter l where a <b>1</b> should be.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">6</span><span class="lab">Bonus</span></div>
+    <h2>Make the button change its OWN words</h2>
+    <p>Printing a message is nice, but the player only sees it in the Output. Let us make the button change the words on itself, so the player sees it too. A button holds its words in <b>Text</b>. Change the print line to this:</p>
+    <div class="code new"><span class="newtag">CHANGE THIS LINE</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre>    button.Text = <span class="str">"You tapped me!"</span></pre></div>
+    <p>It means: "button, change your <b>Text</b> to these new words." Now when the player taps, the button itself changes in front of their eyes.</p>
+    <p class="typehint">Capital <b>T</b> in <span class="mono">Text</span>. And keep the spaces at the start of the line, so it stays inside the box.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Change the print line to the <span class="mono">button.Text</span> line.</li>
+          <li>Press <b>Play</b>.</li>
+          <li>Tap the button. Do the words change?</li>
+          <li>Try your own words. Play again.</li>
+        </ol>
+        <p class="after">Now the whole screen answers the player. You built a real button!</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: a LocalScript runs on the player's own screen</div>
+      <p>A plain Script runs on the game's backstage brain, one for the whole game. A LocalScript runs on one player's screen, their own phone or computer. Buttons and screen things live on each player's screen, so they use LocalScripts. That is the whole rule.</p>
+    </div>
+  </section>
+
+  <!-- CELEBRATION -->
+  <section class="card celebrate locked" id="celebrate">
+    <div class="badge" id="badge">🔒</div>
+    <h2 id="celebTitle">Finish all 6 steps to earn your badge</h2>
+    <p id="celebText" class="locktext">Tick off each "I did it!" as you go. Your Day 10 Button Maker Badge is waiting.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section>
+    <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it.</p>
+    <div class="quizgrid">
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is a GUI?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">The buttons and words drawn ON the screen. They float on top, like stickers on the glass. They are not in the 3D world.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Where does a screen button need to live?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Inside a ScreenGui, which sits inside StarterGui. The ScreenGui is the holder for screen things.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What does a LocalScript do?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">It runs code on the player's own screen, their phone or computer. Buttons use LocalScripts because a button lives on one player's screen.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is <span class="mono">MouseButton1Click</span>?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">The button's alarm. It rings when the player taps the button. It is just another "when X, do Y" event, like Touched was for blocks.</div></div></div></button>
+    </div>
+  </section>
+
+  <!-- TOMORROW -->
+  <section class="card tomorrow">
+    <div class="eyebrow">🔮 Tomorrow · Day 11</div>
+    <div class="lava">🎨</div>
+    <h2>Make It Yours</h2>
+    <p>Your game works. Now make it feel like YOURS. Tomorrow: give your game a name, an icon, and your own colours and theme.</p>
+  </section>
+
+  <p class="parent-note">
+    <b>For the parent:</b> today he learns that games have two layers, the 3D world and the on-screen GUI, and he wires his first button. The win is that he can explain <b>why a button uses a LocalScript</b> (it runs on the player's own screen). For the check-in, ask him to change the button's words to a message of his own and predict what will happen before he presses Play. If nothing happens, the "Nothing happened?" box under Step 5 covers the three real causes: the LocalScript in the wrong place, using a plain Script instead of a LocalScript, or a capital-letter typo. All normal, all part of the lesson.
+  </p>
+
+</main>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DAY = 'day10';
+    var steps = document.querySelectorAll('[data-step]');
+    var total = steps.length;
+    var done = 0;
+    var fill = document.getElementById('xpfill');
+    var count = document.getElementById('xpcount');
+    var celebrate = document.getElementById('celebrate');
+    var badge = document.getElementById('badge');
+    var celebTitle = document.getElementById('celebTitle');
+    var celebText = document.getElementById('celebText');
+
+    function loadProgress(){ try { return JSON.parse(localStorage.getItem('rbs_progress') || '{}'); } catch (e) { return {}; } }
+    function saveProgress(p){ try { localStorage.setItem('rbs_progress', JSON.stringify(p)); } catch (e) {} }
+    function recordStep(idx){ var p = loadProgress(); p[DAY] = p[DAY] || { steps: [], done: false }; if (p[DAY].steps.indexOf(idx) === -1) p[DAY].steps.push(idx); if (p[DAY].steps.length >= total) p[DAY].done = true; saveProgress(p); }
+
+    steps.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('done')) return;
+        markDone(btn); recordStep(idx); smallPop(btn);
+        if (done === total) finish(true);
+      });
+    });
+    function markDone(btn){ btn.classList.add('done'); btn.textContent = 'Done!'; done++; fill.style.width = Math.round((done/total)*100) + '%'; count.textContent = done; }
+    (function restore(){ var p = loadProgress(); var saved = (p[DAY] && p[DAY].steps) || []; steps.forEach(function (btn, idx){ if (saved.indexOf(idx) !== -1) markDone(btn); }); if (done === total) finish(false); })();
+
+    function finish(animate){
+      celebrate.classList.remove('locked'); celebrate.classList.add('unlocked');
+      badge.textContent = '🎛️';
+      celebTitle.textContent = 'YOU DID IT! Day 10 Button Maker Badge earned 🎉';
+      celebText.className = '';
+      celebText.textContent = 'Today you learned that games have two layers: the 3D world and the GUI on the screen. You made a ScreenGui, added a TextButton, put a LocalScript inside it, and wired the MouseButton1Click event so the button answers when the player taps it. You even made the button change its own words. Real games are full of buttons just like this one. You are a button maker now. See you on Day 11!';
+      var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
+      if (animate){ celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); if (!reduce) confettiBurst(); }
+    }
+    function smallPop(el){ if (reduce) return; el.animate([{ transform:'scale(1)' },{ transform:'scale(1.15)' },{ transform:'scale(1)' }], { duration:260, easing:'ease-out' }); }
+
+    document.querySelectorAll('.flip').forEach(function (f){ f.addEventListener('click', function(){ f.classList.toggle('flipped'); }); });
+
+    function confettiBurst(){
+      var cv = document.getElementById('confetti'); var ctx = cv.getContext('2d');
+      var W = cv.width = window.innerWidth, H = cv.height = window.innerHeight;
+      var cols = ['#FF5A47','#2E9BF0','#2FB35C','#FFC531','#8B5CF6']; var bits = [];
+      for (var i=0;i<140;i++){ bits.push({ x:W/2, y:H/3, vx:(Math.random()-0.5)*14, vy:Math.random()*-15-4, s:6+Math.random()*8, c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-0.5)*0.4 }); }
+      var t=0;
+      function frame(){ ctx.clearRect(0,0,W,H); t++; bits.forEach(function(p){ p.vy+=0.4; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); if (t<160) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H); }
+      frame();
+    }
+  })();
+</script>

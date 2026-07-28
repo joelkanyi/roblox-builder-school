@@ -1,0 +1,513 @@
+<title>Day 7 · The Scoreboard</title>
+<style>
+  :root {
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun:#FFC531; --sky:#2E9BF0; --grass:#2FB35C; --coral:#FF5A47; --grape:#8B5CF6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r:22px; --maxw:880px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+      --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+      --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+  }
+  :root[data-theme="light"] { --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10); --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16); }
+  :root[data-theme="dark"] { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+    --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:18px; overflow-x:hidden; }
+  .mono { font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+
+  .topbar { position:sticky; top:0; z-index:60; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(8px); border-bottom:2px solid var(--line); }
+  .topbar .wrap { display:flex; align-items:center; gap:14px; height:58px; }
+  .homebtn { flex:none; width:40px; height:40px; border-radius:12px; background:var(--card); border:2px solid var(--line); display:grid; place-items:center; text-decoration:none; font-size:18px; }
+  .homebtn:hover { border-color:var(--sky); }
+  .daychip { font-weight:800; font-size:15px; background:var(--grape); color:#fff; padding:5px 12px; border-radius:999px; white-space:nowrap; }
+  .xp-wrap { flex:1; height:16px; background:var(--line); border-radius:999px; overflow:hidden; }
+  .xp-fill { height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--grape),var(--coral)); transition:width .5s cubic-bezier(.2,.9,.3,1.2); }
+  .xp-label { font-weight:800; font-size:14px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .xp-label b { color:var(--grape); }
+
+  .hero { position:relative; padding:38px 0 16px; text-align:center; }
+  .hero-block { width:88px; height:88px; margin:0 auto 6px; border-radius:18px; background:#8a8f9c; box-shadow:var(--shadow-lg); position:relative; animation:wake 4s ease-in-out infinite; }
+  @keyframes wake { 0%,55%{ background:#8a8f9c; transform:scale(1);} 65%{ background:var(--coral); transform:scale(1.12);} 85%{ background:var(--coral);} 100%{ background:#8a8f9c;} }
+  .hero-block .zzz { position:absolute; top:-22px; right:-8px; font-size:20px; animation:zzz 4s ease-in-out infinite; }
+  @keyframes zzz { 0%,50%{ opacity:1;} 60%,100%{ opacity:0;} }
+  .hero-block .spark { position:absolute; inset:0; display:grid; place-items:center; font-size:34px; opacity:0; animation:spark 4s ease-in-out infinite; }
+  @keyframes spark { 0%,58%{ opacity:0; transform:scale(.4);} 66%{ opacity:1; transform:scale(1);} 84%{ opacity:1;} 90%,100%{ opacity:0;} }
+  .eyebrow { font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--grape); font-size:13px; }
+  h1 { font-size:clamp(2rem,6.5vw,3.2rem); line-height:1.02; margin:8px 0 0; font-weight:900; letter-spacing:-.02em; text-wrap:balance; }
+  h1 .pop { color:var(--coral); }
+  .hook { font-size:clamp(1.05rem,2.6vw,1.28rem); color:var(--ink-soft); max-width:32ch; margin:14px auto 0; font-weight:600; }
+
+  section { padding:14px 0; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; margin:16px 0; }
+
+  .fundi { width:88px; height:88px; flex:none; animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+  .meet { display:flex; gap:18px; align-items:center; background:var(--sun-soft); border-color:color-mix(in srgb, var(--sun) 40%, var(--line)); }
+  .meet h3 { margin:0 0 4px; font-size:1.2rem; }
+  .meet p { margin:0; font-size:.95rem; color:var(--ink-soft); }
+  .meet .say { font-weight:800; color:#8a6a00; }
+  @media (prefers-color-scheme: dark){ .meet .say{ color:var(--sun);} }
+  :root[data-theme="dark"] .meet .say { color:var(--sun); }
+
+  .step-num { display:inline-flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .step-num .n { width:40px; height:40px; border-radius:12px; background:var(--grape); color:#fff; font-weight:900; font-size:20px; display:grid; place-items:center; box-shadow:var(--shadow); }
+  .step-num .lab { font-weight:800; letter-spacing:.1em; text-transform:uppercase; font-size:12px; color:var(--ink-faint); }
+  .step h2 { font-size:clamp(1.35rem,4vw,1.85rem); margin:2px 0 10px; font-weight:900; letter-spacing:-.01em; text-wrap:balance; }
+  .step p { margin:0 0 12px; color:var(--ink-soft); font-weight:500; }
+  .step p b, .step li b { color:var(--ink); }
+
+  .stage { background:linear-gradient(180deg,var(--grape-soft),transparent); border:2px dashed color-mix(in srgb, var(--grape) 35%, var(--line)); border-radius:16px; min-height:150px; display:grid; place-items:center; margin:8px 0 16px; padding:18px; overflow:hidden; }
+
+  /* code box (always dark, like a real editor) */
+  .code { position:relative; background:#191527; border:2px solid #2c2740; border-radius:14px; margin:6px 0 14px; overflow-x:auto; box-shadow:var(--shadow); }
+  .code .bar { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid #2c2740; }
+  .code .bar i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .code pre { margin:0; padding:16px 18px; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:15px; line-height:1.7; color:#EDE9FA; white-space:pre; }
+  .code .kw { color:#FF8FB0; } .code .fn { color:#7FD1FF; } .code .str { color:#8CE0B0; } .code .num { color:#FFC96B; } .code .cm { color:#8B84A0; }
+  .code.new { border-color:var(--grape); box-shadow:0 0 0 3px color-mix(in srgb, var(--grape) 25%, transparent); }
+  .newtag { position:absolute; top:-11px; right:14px; background:var(--grape); color:#fff; font-weight:800; font-size:10.5px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; }
+  .typehint { font-size:.82rem; color:var(--ink-faint); font-weight:600; margin:-6px 0 12px; }
+  .typehint b { color:var(--coral); }
+
+  .keycap { display:inline-grid; place-items:center; min-width:26px; height:26px; padding:0 6px; border-radius:7px; background:var(--card); border:1.5px solid var(--line); border-bottom-width:3px; font-weight:900; font-size:13px; font-family:ui-monospace,monospace; color:var(--ink-soft); vertical-align:middle; }
+
+  /* when-do panels */
+  .wd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .wd .panel { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px 18px; text-align:center; min-width:120px; box-shadow:var(--shadow); }
+  .wd .panel .t { font-weight:900; font-size:11px; letter-spacing:.1em; color:var(--ink-faint); }
+  .wd .panel .e { font-size:34px; }
+  .wd .arrow { font-size:26px; color:var(--grape); font-weight:900; }
+  .wd .when .t { color:var(--sky); } .wd .do .t { color:var(--coral); }
+
+  /* explorer tick/x */
+  .treecmp { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; }
+  .treebox { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px; flex:1; min-width:200px; }
+  .treebox.good { border-color:var(--grass); } .treebox.bad { border-color:var(--coral); }
+  .treebox .cap { font-weight:900; font-size:.85rem; margin-bottom:8px; }
+  .treebox.good .cap { color:var(--grass); } .treebox.bad .cap { color:var(--coral); }
+  .trow { padding:5px 8px; font-weight:700; font-size:.9rem; }
+  .trow.ind1 { margin-left:16px; color:var(--ink-soft); } .trow.ind2 { margin-left:34px; color:var(--ink-soft); }
+
+  .yourturn { background:var(--grass-soft); border:2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius:16px; padding:16px 18px; display:flex; gap:14px; align-items:center; }
+  .yourturn .txt { flex:1; } .yourturn .txt p { margin:0; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt ol { margin:2px 0 0; padding-left:22px; }
+  .yourturn .txt li { margin-bottom:5px; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt .after { margin:6px 0 0; color:var(--grass); font-weight:800; font-size:.95rem; }
+  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:4px; }
+  .didit { flex:none; border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:.95rem; color:#fff; background:var(--grass); padding:12px 18px; border-radius:999px; box-shadow:0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition:transform .1s, background .2s; white-space:nowrap; }
+  .didit:hover { transform:translateY(-2px); } .didit:active { transform:translateY(2px); }
+  .didit.done { background:var(--ink-faint); box-shadow:0 4px 0 rgba(0,0,0,.2); cursor:default; }
+  .didit.done::before { content:"✓ "; }
+
+  .snack { background:var(--sun-soft); border:2px solid color-mix(in srgb, var(--sun) 45%, var(--line)); border-radius:16px; padding:14px 18px; margin:16px 0; }
+  .snack .h { font-weight:900; font-size:.85rem; letter-spacing:.04em; color:#8a6a00; margin-bottom:4px; }
+  @media (prefers-color-scheme: dark){ .snack .h{ color:var(--sun);} }
+  :root[data-theme="dark"] .snack .h { color:var(--sun); }
+  .snack p { margin:0; font-size:.96rem; color:var(--ink-soft); font-weight:500; }
+
+  /* troubleshooter */
+  .trouble { background:var(--coral-soft); border:2px solid color-mix(in srgb, var(--coral) 40%, var(--line)); border-radius:16px; padding:6px 18px; margin:14px 0; }
+  .trouble summary { cursor:pointer; font-weight:900; padding:12px 0; list-style:none; color:var(--coral); }
+  .trouble summary::-webkit-details-marker { display:none; }
+  .trouble summary::before { content:"🔧 "; }
+  .trouble ol { margin:0 0 14px; padding-left:22px; color:var(--ink); font-weight:500; font-size:.95rem; }
+  .trouble li { margin-bottom:8px; }
+  .trouble b { color:var(--ink); }
+
+  .celebrate { text-align:center; background:linear-gradient(180deg,var(--grape-soft),var(--card)); border-color:color-mix(in srgb, var(--grape) 40%, var(--line)); }
+  .celebrate.locked { opacity:.5; filter:grayscale(.6); }
+  .celebrate h2 { font-size:clamp(1.5rem,5vw,2.2rem); margin:0 0 6px; }
+  .badge { width:120px; height:120px; margin:8px auto 4px; display:grid; place-items:center; font-size:60px; background:var(--grape); border-radius:50%; box-shadow:var(--shadow-lg); border:5px solid #fff; }
+  .celebrate.unlocked .badge { animation:pop .6s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes pop { 0%{ transform:scale(0) rotate(-40deg);} 100%{ transform:scale(1) rotate(0);} }
+  .locktext { font-weight:700; color:var(--ink-faint); font-size:.95rem; }
+
+  .quizgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:620px){ .quizgrid{ grid-template-columns:1fr;} }
+  .flip { background:transparent; perspective:1000px; min-height:160px; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--ink); }
+  .flip-inner { position:relative; width:100%; height:100%; min-height:160px; transition:transform .5s; transform-style:preserve-3d; }
+  .flip.flipped .flip-inner { transform:rotateY(180deg); }
+  .flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:16px; padding:18px; display:flex; flex-direction:column; justify-content:center; text-align:left; border:2px solid var(--line); }
+  .flip-front { background:var(--sky-soft); }
+  .flip-front .q { font-weight:800; font-size:1rem; color:var(--ink); }
+  .flip-front .tap { margin-top:auto; font-size:.8rem; color:var(--ink-faint); font-weight:700; }
+  .flip-back { background:var(--grass-soft); transform:rotateY(180deg); }
+  .flip-back .a { font-weight:600; font-size:.92rem; color:var(--ink); }
+
+  .tomorrow { text-align:center; background:#221B33; color:#fff; border:none; }
+  .tomorrow .eyebrow { color:var(--coral); }
+  .tomorrow h2 { color:#fff; margin:6px 0; }
+  .tomorrow p { color:#cfc8dd; max-width:34ch; margin:0 auto; }
+  .lava { font-size:48px; animation:lavapulse 1.4s ease-in-out infinite; }
+  @keyframes lavapulse { 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 6px var(--coral)); } 50%{ transform:scale(1.15); filter:drop-shadow(0 0 18px var(--coral)); } }
+
+  .parent-note { font-size:.82rem; color:var(--ink-faint); text-align:center; max-width:62ch; margin:20px auto 60px; padding:0 20px; }
+  .parent-note b { color:var(--ink-soft); }
+
+  #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
+  :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+</style>
+
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="index.html" class="homebtn" aria-label="Back to Builder School home">🏠</a>
+    <span class="daychip">🏆 Day 7</span>
+    <div class="xp-wrap"><div class="xp-fill" id="xpfill"></div></div>
+    <span class="xp-label"><b id="xpcount">0</b>/7 ⭐</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-block" aria-hidden="true"><span class="zzz">0</span><span class="spark">🏆</span></div>
+    <div class="eyebrow">Roblox Builder School</div>
+    <h1>The <span class="pop">Scoreboard</span></h1>
+    <p class="hook">Today you add the scoreboard in the top-right corner. Reach the finish and your Wins go up!</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card meet">
+    <svg class="fundi" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h3>Karibu back, Builder! 🐦</h3>
+      <p>Your game is fun. But Fundi asks: how does a player know they are winning? Today you add a <b>scoreboard</b>. It sits in the top-right corner and shows one word: <b>Wins</b>. When the player reaches the finish, the number goes up by 1. It is like the score on the wall at a football match. Every player can see it. <span class="say">Twende, let us keep score!</span></p>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">1</span><span class="lab">The big idea</span></div>
+    <h2>A variable: a labelled box for a number</h2>
+    <p>First, one small word: <b>variable</b>. Do not be scared of it. A variable is just a <b>labelled box</b> that holds a number the game remembers. Think of a jar in the kitchen with a paper label that says <b>Wins</b>. Right now the jar holds <b>0</b>. Later we drop one more in, and it holds <b>1</b>. The label never changes. The number inside can grow.</p>
+    <div class="stage">
+      <div class="wd">
+        <div class="panel"><div class="t">LABEL</div><div class="e">🏺</div><div style="font-size:.8rem;font-weight:700;">Wins</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel do"><div class="t">NUMBER INSIDE</div><div class="e">0️⃣</div><div style="font-size:.8rem;font-weight:700;">grows to 1, 2, 3...</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>No typing yet.</li>
+          <li>Point at a real jar or cup in your home.</li>
+          <li>Pretend its label says <b>Wins</b>.</li>
+          <li>Say: "It holds 0 now. It can grow."</li>
+        </ol>
+        <p class="after">Now you know what a variable is. 🏺</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">2</span><span class="lab">The backstage brain</span></div>
+    <h2>Add a Script in ServerScriptService</h2>
+    <p>The scoreboard is a game rule, not a block rule. Game rules live in a special place called <b>ServerScriptService</b>. Think of it as the game's <b>backstage brain</b>. The player never sees it. The game keeps its own rules there. We put our scoreboard code inside it.</p>
+    <div class="stage">
+      <div class="treecmp">
+        <div class="treebox good">
+          <div class="cap">✅ Do this: Script in ServerScriptService</div>
+          <div class="trow">🧠 ServerScriptService</div>
+          <div class="trow ind1">📜 Script</div>
+        </div>
+        <div class="treebox bad">
+          <div class="cap">❌ Not this: Script in Workspace</div>
+          <div class="trow">📦 Workspace</div>
+          <div class="trow ind1">📜 Script</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>In the Explorer, find <b>ServerScriptService</b>.</li>
+          <li>Put your mouse on it.</li>
+          <li>Click the <b>+</b> sign.</li>
+          <li>Choose <b>Script</b>.</li>
+          <li>Open the Script. Delete everything inside it.</li>
+        </ol>
+        <p class="after">Your Script is now backstage. 🧠</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">3</span><span class="lab">When a player joins</span></div>
+    <h2>When a player joins, make a scoreboard folder</h2>
+    <p>Now type, one piece at a time. First we need the players. Type this line:</p>
+    <div class="code new"><span class="newtag">NEW LINE</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> Players = game:<span class="fn">GetService</span>(<span class="str">"Players"</span>)</pre></div>
+    <p>Read it: "Give me the list of Players in this game. Call it <b>Players</b>." Now the "when a player joins" part. <b>PlayerAdded</b> means "when a new player joins the game, do this." Add these lines:</p>
+    <div class="code new"><span class="newtag">NEW LINES</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre>Players.PlayerAdded:<span class="fn">Connect</span>(<span class="kw">function</span>(player)
+    <span class="kw">local</span> leaderstats = Instance.<span class="fn">new</span>(<span class="str">"Folder"</span>)
+    leaderstats.Name = <span class="str">"leaderstats"</span>
+    leaderstats.Parent = player
+<span class="kw">end</span>)</pre></div>
+    <p><b>Instance.new("Folder")</b> makes a new folder by code, like getting a fresh empty envelope. We name it <b>leaderstats</b>. That name is magic: Roblox looks for a folder with that exact name and shows it on the scoreboard. Then we give the folder to the player.</p>
+    <p class="typehint">Spell it <b>leaderstats</b>, all small letters, no space. Roblox only shows the scoreboard if the name is exactly right.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Type the <span class="mono">Players</span> line.</li>
+          <li>Type the <span class="mono">PlayerAdded</span> block under it.</li>
+          <li>Go slow. Match every capital letter.</li>
+        </ol>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: A variable remembers a number</div>
+      <p>A variable is a named box that remembers a number for the game. Our box is named Wins. The game keeps that number safe, even while the player runs and jumps. When you want to change the score, you just change what is in the box.</p>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">4</span><span class="lab">Add the Wins box</span></div>
+    <h2>Put a "Wins" number in the folder, starting at 0</h2>
+    <p>The folder is empty. Now we put the <b>Wins</b> box inside it. An <b>IntValue</b> is a box that holds a whole number (Int is short for a whole number, like 0, 1, 2, no halves). Add these lines <b>before</b> the <span class="mono">end)</span>, so they are inside the function:</p>
+    <div class="code new"><span class="newtag">NEW LINES</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre>    <span class="kw">local</span> wins = Instance.<span class="fn">new</span>(<span class="str">"IntValue"</span>)
+    wins.Name = <span class="str">"Wins"</span>
+    wins.Value = <span class="num">0</span>
+    wins.Parent = leaderstats</pre></div>
+    <p>Read it: "Make a new whole-number box. Name it <b>Wins</b>. Start it at <b>0</b>. Put it inside the leaderstats folder." The word on the scoreboard will be <b>Wins</b>, because that is the name. Here is the whole backstage Script now:</p>
+    <div class="code"><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> Players = game:<span class="fn">GetService</span>(<span class="str">"Players"</span>)
+
+Players.PlayerAdded:<span class="fn">Connect</span>(<span class="kw">function</span>(player)
+    <span class="kw">local</span> leaderstats = Instance.<span class="fn">new</span>(<span class="str">"Folder"</span>)
+    leaderstats.Name = <span class="str">"leaderstats"</span>
+    leaderstats.Parent = player
+
+    <span class="kw">local</span> wins = Instance.<span class="fn">new</span>(<span class="str">"IntValue"</span>)
+    wins.Name = <span class="str">"Wins"</span>
+    wins.Value = <span class="num">0</span>
+    wins.Parent = leaderstats
+<span class="kw">end</span>)</pre></div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Add the four <span class="mono">wins</span> lines inside the function.</li>
+          <li>Check your Script looks exactly like the whole one above.</li>
+          <li>Count: the last line is <span class="mono">end)</span>.</li>
+        </ol>
+        <p class="after">Your scoreboard code is ready! 🏆</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: leaderstats is the magic folder</div>
+      <p>leaderstats is a special folder name. Roblox is always watching for it. When it sees a folder called leaderstats inside a player, it shows the boxes inside it on the top-right scoreboard. Any other name and nothing shows. The name is the magic word.</p>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">5</span><span class="lab">See it</span></div>
+    <h2>Press Play. See "Wins 0" in the top-right</h2>
+    <p>Time to look. Press <b>Play</b>. Look at the <b>top-right corner</b> of the screen. You should see your name and, next to it, <b>Wins</b> with a <b>0</b>. That is your scoreboard, alive! It is 0 because nobody has finished yet. That is correct.</p>
+    <div class="stage">
+      <div class="treebox good" style="max-width:280px; margin:0 auto;">
+        <div class="cap" style="color:var(--ink-soft);">📺 Top-right of your screen</div>
+        <div class="trow" style="display:flex; justify-content:space-between;"><span>🐦 You</span><span></span></div>
+        <div class="trow" style="display:flex; justify-content:space-between; border-top:1px solid var(--line);"><span style="color:var(--ink-faint);">Wins</span><span style="font-weight:900; color:var(--grape);">0</span></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Play</b>.</li>
+          <li>Look at the top-right corner.</li>
+          <li>Do you see <b>Wins</b> and <b>0</b>?</li>
+          <li>Press <b>Stop</b>.</li>
+        </ol>
+        <p class="after">The scoreboard works. Now let us make it move.</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">6</span><span class="lab">The finish block</span></div>
+    <h2>Put a script on your finish block: add 1 to Wins</h2>
+    <p>The 0 needs to grow. We put a second, small script <b>inside your finish block</b> (the block a player reaches to win). This one lives in the block, not backstage. Make a Script inside your finish block, delete everything, and type this:</p>
+    <div class="code new"><span class="newtag">NEW SCRIPT</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> finish = script.Parent
+
+finish.Touched:<span class="fn">Connect</span>(<span class="kw">function</span>(otherPart)
+    <span class="kw">local</span> player = game.Players:<span class="fn">GetPlayerFromCharacter</span>(otherPart.Parent)
+    <span class="kw">if</span> player <span class="kw">then</span>
+        player.leaderstats.Wins.Value = player.leaderstats.Wins.Value + <span class="num">1</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>)</pre></div>
+    <p>Read it: "This block is <b>finish</b>. When something touches me, find out which player it was. <b>If</b> it really is a player, open their Wins box and make it <b>1 more</b> than it was." The <span class="mono">if player then</span> check is polite: it makes sure a real player touched it, not a falling brick.</p>
+    <p class="typehint">Spell <b>Wins</b> the same as before, capital W. If the finish script says <span class="mono">Wins</span> but the backstage script named it <span class="mono">wins</span>, they will not match.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Put a Script inside your <b>finish block</b>.</li>
+          <li>Delete everything inside it.</li>
+          <li>Type the script above.</li>
+          <li>Check <b>Wins</b> is spelled the same in both scripts.</li>
+        </ol>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Spell the name the same everywhere</div>
+      <p>The name "Wins" must be spelled the same in every place: in the backstage script that makes it, and in the finish script that adds to it. Wins, wins, and WINS are three different words to the computer. One box, one spelling, everywhere.</p>
+    </div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">7</span><span class="lab">Score!</span></div>
+    <h2>Play. Reach the finish. Watch Wins become 1. 🏆</h2>
+    <p>The big moment. Press <b>Play</b>. Look at the scoreboard: <b>Wins 0</b>. Now run your character all the way to the finish block and touch it. Watch the top-right corner. Did the <b>0</b> jump to <b>1</b>? THAT is your code keeping score. Every win, the number climbs.</p>
+    <div class="stage">
+      <div style="position:relative; width:100%; height:110px;">
+        <div style="position:absolute; bottom:18px; left:0; right:0; height:6px; background:var(--grass); border-radius:3px;"></div>
+        <div class="hero-block" style="position:absolute; bottom:24px; right:20%; width:46px; height:46px; margin:0; animation:wake 3.4s ease-in-out infinite;"></div>
+        <div style="position:absolute; bottom:22px; font-size:32px; animation:runacross 3.4s ease-in-out infinite;">🏃</div>
+        <div style="position:absolute; top:6px; right:8px; font-size:.8rem; font-weight:900; color:var(--grape);">Wins 1</div>
+      </div>
+    </div>
+    <style>@keyframes runacross { 0%{left:4%;} 55%{left:64%;} 100%{left:4%;} }</style>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Play</b>. Run to the finish block.</li>
+          <li>Touch it. Watch the top-right corner.</li>
+          <li>Did <b>Wins</b> go from 0 to 1? 🏆</li>
+          <li>Touch it again. Does it go to 2?</li>
+        </ol>
+        <p class="after">You made a real scoreboard. High five! ✋</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <details class="trouble">
+      <summary>No scoreboard, or Wins does not grow? Tap here, do not panic</summary>
+      <ol>
+        <li><b>No scoreboard at all?</b> Check the backstage script is in <b>ServerScriptService</b>, not Workspace. Check the folder name is spelled exactly <span class="mono">leaderstats</span>, all small letters, no space.</li>
+        <li><b>Wins shows but stays 0?</b> Check the finish script is <b>inside your finish block</b>. Check <b>Wins</b> is spelled the same in both scripts (capital W in both).</li>
+        <li><b>Look for red text in the Output window.</b> Red text is the computer helping you. It points at the exact line with the problem. Check that line for a small letter that should be a capital.</li>
+      </ol>
+    </details>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Games remember with variables</div>
+      <p>Coins, health, points, lives, gems: every one of them is a variable, a labelled box holding a number. Add to it, take from it, show it on the screen. You now know the trick behind every score in every game. It is just boxes with numbers, changing.</p>
+    </div>
+  </section>
+
+  <!-- CELEBRATION -->
+  <section class="card celebrate locked" id="celebrate">
+    <div class="badge" id="badge">🔒</div>
+    <h2 id="celebTitle">Finish all 7 steps to earn your badge</h2>
+    <p id="celebText" class="locktext">Tick off each "I did it!" as you go. Your Day 7 Scoreboard Badge is waiting.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section>
+    <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it.</p>
+    <div class="quizgrid">
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What is a variable, in your own words?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">A labelled box that holds a number the game remembers. Like a jar labelled Wins that holds 0, then 1, then 2.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Why must the folder be named <span class="mono">leaderstats</span>?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Because Roblox watches for that exact name and shows it on the top-right scoreboard. Any other name and nothing appears.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Where does the scoreboard script go, and why?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">In ServerScriptService, the game's backstage brain, where the game's own rules live. It is a game rule, not a block rule.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">A friend's Wins shows but never grows. What should they check first?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Spelling. Wins must be spelled the same in both scripts. The finish script must also be inside the finish block.</div></div></div></button>
+    </div>
+  </section>
+
+  <!-- TOMORROW -->
+  <section class="card tomorrow">
+    <div class="eyebrow">🔮 Tomorrow · Day 8</div>
+    <div class="lava">⚡</div>
+    <h2>You build SPEED PADS</h2>
+    <p>You keep score. Now let us make it exciting. Tomorrow: power-up pads. Step on one and your player runs super fast, whoosh, across the whole map.</p>
+  </section>
+
+  <p class="parent-note">
+    <b>For the parent:</b> today he adds a leaderstats scoreboard, so the win is not just that the number moves, it is that he can explain why. For the check-in, ask him: <b>where does the Wins number live, and why must it be spelled the same in both scripts?</b> If he is stuck, the "No scoreboard?" box under Step 7 covers the two real causes (wrong place for the script, or a name that does not match). Both are normal and are the actual lesson.
+  </p>
+
+</main>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DAY = 'day7';
+    var steps = document.querySelectorAll('[data-step]');
+    var total = steps.length;
+    var done = 0;
+    var fill = document.getElementById('xpfill');
+    var count = document.getElementById('xpcount');
+    var celebrate = document.getElementById('celebrate');
+    var badge = document.getElementById('badge');
+    var celebTitle = document.getElementById('celebTitle');
+    var celebText = document.getElementById('celebText');
+
+    function loadProgress(){ try { return JSON.parse(localStorage.getItem('rbs_progress') || '{}'); } catch (e) { return {}; } }
+    function saveProgress(p){ try { localStorage.setItem('rbs_progress', JSON.stringify(p)); } catch (e) {} }
+    function recordStep(idx){ var p = loadProgress(); p[DAY] = p[DAY] || { steps: [], done: false }; if (p[DAY].steps.indexOf(idx) === -1) p[DAY].steps.push(idx); if (p[DAY].steps.length >= total) p[DAY].done = true; saveProgress(p); }
+
+    steps.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('done')) return;
+        markDone(btn); recordStep(idx); smallPop(btn);
+        if (done === total) finish(true);
+      });
+    });
+    function markDone(btn){ btn.classList.add('done'); btn.textContent = 'Done!'; done++; fill.style.width = Math.round((done/total)*100) + '%'; count.textContent = done; }
+    (function restore(){ var p = loadProgress(); var saved = (p[DAY] && p[DAY].steps) || []; steps.forEach(function (btn, idx){ if (saved.indexOf(idx) !== -1) markDone(btn); }); if (done === total) finish(false); })();
+
+    function finish(animate){
+      celebrate.classList.remove('locked'); celebrate.classList.add('unlocked');
+      badge.textContent = '🏆';
+      celebTitle.textContent = 'YOU DID IT! Day 7 Scoreboard Badge earned 🎉';
+      celebText.className = '';
+      celebText.textContent = 'Today you gave your game a memory! You learned that a variable is a labelled box that holds a number. You made a leaderstats folder, put a Wins box inside it starting at 0, and made a finish block add 1 to it. Now your game keeps score, just like the big Roblox games. Coins, health, points, gems: they all work this exact way. You are keeping score with real code now. See you on Day 8!';
+      var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
+      if (animate){ celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); if (!reduce) confettiBurst(); }
+    }
+    function smallPop(el){ if (reduce) return; el.animate([{ transform:'scale(1)' },{ transform:'scale(1.15)' },{ transform:'scale(1)' }], { duration:260, easing:'ease-out' }); }
+
+    document.querySelectorAll('.flip').forEach(function (f){ f.addEventListener('click', function(){ f.classList.toggle('flipped'); }); });
+
+    function confettiBurst(){
+      var cv = document.getElementById('confetti'); var ctx = cv.getContext('2d');
+      var W = cv.width = window.innerWidth, H = cv.height = window.innerHeight;
+      var cols = ['#FF5A47','#2E9BF0','#2FB35C','#FFC531','#8B5CF6']; var bits = [];
+      for (var i=0;i<140;i++){ bits.push({ x:W/2, y:H/3, vx:(Math.random()-0.5)*14, vy:Math.random()*-15-4, s:6+Math.random()*8, c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-0.5)*0.4 }); }
+      var t=0;
+      function frame(){ ctx.clearRect(0,0,W,H); t++; bits.forEach(function(p){ p.vy+=0.4; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); if (t<160) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H); }
+      frame();
+    }
+  })();
+</script>

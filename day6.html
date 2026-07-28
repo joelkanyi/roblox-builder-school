@@ -1,0 +1,474 @@
+<title>Day 6 · Publish Your Game</title>
+<style>
+  :root {
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun:#FFC531; --sky:#2E9BF0; --grass:#2FB35C; --coral:#FF5A47; --grape:#8B5CF6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r:22px; --maxw:880px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+      --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+      --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+  }
+  :root[data-theme="light"] { --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10); --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16); }
+  :root[data-theme="dark"] { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+    --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:18px; overflow-x:hidden; }
+  .mono { font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+
+  .topbar { position:sticky; top:0; z-index:60; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(8px); border-bottom:2px solid var(--line); }
+  .topbar .wrap { display:flex; align-items:center; gap:14px; height:58px; }
+  .homebtn { flex:none; width:40px; height:40px; border-radius:12px; background:var(--card); border:2px solid var(--line); display:grid; place-items:center; text-decoration:none; font-size:18px; }
+  .homebtn:hover { border-color:var(--sky); }
+  .daychip { font-weight:800; font-size:15px; background:var(--grape); color:#fff; padding:5px 12px; border-radius:999px; white-space:nowrap; }
+  .xp-wrap { flex:1; height:16px; background:var(--line); border-radius:999px; overflow:hidden; }
+  .xp-fill { height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--grape),var(--coral)); transition:width .5s cubic-bezier(.2,.9,.3,1.2); }
+  .xp-label { font-weight:800; font-size:14px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .xp-label b { color:var(--grape); }
+
+  .hero { position:relative; padding:38px 0 16px; text-align:center; }
+  .hero-block { width:88px; height:88px; margin:0 auto 6px; border-radius:18px; background:#8a8f9c; box-shadow:var(--shadow-lg); position:relative; animation:wake 4s ease-in-out infinite; }
+  @keyframes wake { 0%,55%{ background:#8a8f9c; transform:scale(1);} 65%{ background:var(--coral); transform:scale(1.12);} 85%{ background:var(--coral);} 100%{ background:#8a8f9c;} }
+  .hero-block .zzz { position:absolute; top:-22px; right:-8px; font-size:20px; animation:zzz 4s ease-in-out infinite; }
+  @keyframes zzz { 0%,50%{ opacity:1;} 60%,100%{ opacity:0;} }
+  .hero-block .spark { position:absolute; inset:0; display:grid; place-items:center; font-size:34px; opacity:0; animation:spark 4s ease-in-out infinite; }
+  @keyframes spark { 0%,58%{ opacity:0; transform:scale(.4);} 66%{ opacity:1; transform:scale(1);} 84%{ opacity:1;} 90%,100%{ opacity:0;} }
+  .eyebrow { font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--grape); font-size:13px; }
+  h1 { font-size:clamp(2rem,6.5vw,3.2rem); line-height:1.02; margin:8px 0 0; font-weight:900; letter-spacing:-.02em; text-wrap:balance; }
+  h1 .pop { color:var(--coral); }
+  .hook { font-size:clamp(1.05rem,2.6vw,1.28rem); color:var(--ink-soft); max-width:32ch; margin:14px auto 0; font-weight:600; }
+
+  section { padding:14px 0; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; margin:16px 0; }
+
+  .fundi { width:88px; height:88px; flex:none; animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+  .meet { display:flex; gap:18px; align-items:center; background:var(--sun-soft); border-color:color-mix(in srgb, var(--sun) 40%, var(--line)); }
+  .meet h3 { margin:0 0 4px; font-size:1.2rem; }
+  .meet p { margin:0; font-size:.95rem; color:var(--ink-soft); }
+  .meet .say { font-weight:800; color:#8a6a00; }
+  @media (prefers-color-scheme: dark){ .meet .say{ color:var(--sun);} }
+  :root[data-theme="dark"] .meet .say { color:var(--sun); }
+
+  .step-num { display:inline-flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .step-num .n { width:40px; height:40px; border-radius:12px; background:var(--grape); color:#fff; font-weight:900; font-size:20px; display:grid; place-items:center; box-shadow:var(--shadow); }
+  .step-num .lab { font-weight:800; letter-spacing:.1em; text-transform:uppercase; font-size:12px; color:var(--ink-faint); }
+  .step h2 { font-size:clamp(1.35rem,4vw,1.85rem); margin:2px 0 10px; font-weight:900; letter-spacing:-.01em; text-wrap:balance; }
+  .step p { margin:0 0 12px; color:var(--ink-soft); font-weight:500; }
+  .step p b, .step li b { color:var(--ink); }
+
+  .stage { background:linear-gradient(180deg,var(--grape-soft),transparent); border:2px dashed color-mix(in srgb, var(--grape) 35%, var(--line)); border-radius:16px; min-height:150px; display:grid; place-items:center; margin:8px 0 16px; padding:18px; overflow:hidden; }
+
+  /* code box (always dark, like a real editor) */
+  .code { position:relative; background:#191527; border:2px solid #2c2740; border-radius:14px; margin:6px 0 14px; overflow-x:auto; box-shadow:var(--shadow); }
+  .code .bar { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid #2c2740; }
+  .code .bar i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .code pre { margin:0; padding:16px 18px; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:15px; line-height:1.7; color:#EDE9FA; white-space:pre; }
+  .code .kw { color:#FF8FB0; } .code .fn { color:#7FD1FF; } .code .str { color:#8CE0B0; } .code .num { color:#FFC96B; } .code .cm { color:#8B84A0; }
+  .code.new { border-color:var(--grape); box-shadow:0 0 0 3px color-mix(in srgb, var(--grape) 25%, transparent); }
+  .newtag { position:absolute; top:-11px; right:14px; background:var(--grape); color:#fff; font-weight:800; font-size:10.5px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; }
+  .typehint { font-size:.82rem; color:var(--ink-faint); font-weight:600; margin:-6px 0 12px; }
+  .typehint b { color:var(--coral); }
+
+  .keycap { display:inline-grid; place-items:center; min-width:26px; height:26px; padding:0 6px; border-radius:7px; background:var(--card); border:1.5px solid var(--line); border-bottom-width:3px; font-weight:900; font-size:13px; font-family:ui-monospace,monospace; color:var(--ink-soft); vertical-align:middle; }
+
+  /* when-do panels */
+  .wd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .wd .panel { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px 18px; text-align:center; min-width:120px; box-shadow:var(--shadow); }
+  .wd .panel .t { font-weight:900; font-size:11px; letter-spacing:.1em; color:var(--ink-faint); }
+  .wd .panel .e { font-size:34px; }
+  .wd .arrow { font-size:26px; color:var(--grape); font-weight:900; }
+  .wd .when .t { color:var(--sky); } .wd .do .t { color:var(--coral); }
+
+  /* explorer tick/x */
+  .treecmp { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; }
+  .treebox { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px; flex:1; min-width:200px; }
+  .treebox.good { border-color:var(--grass); } .treebox.bad { border-color:var(--coral); }
+  .treebox .cap { font-weight:900; font-size:.85rem; margin-bottom:8px; }
+  .treebox.good .cap { color:var(--grass); } .treebox.bad .cap { color:var(--coral); }
+  .trow { padding:5px 8px; font-weight:700; font-size:.9rem; }
+  .trow.ind1 { margin-left:16px; color:var(--ink-soft); } .trow.ind2 { margin-left:34px; color:var(--ink-soft); }
+
+  .yourturn { background:var(--grass-soft); border:2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius:16px; padding:16px 18px; display:flex; gap:14px; align-items:center; }
+  .yourturn .txt { flex:1; } .yourturn .txt p { margin:0; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt ol { margin:2px 0 0; padding-left:22px; }
+  .yourturn .txt li { margin-bottom:5px; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt .after { margin:6px 0 0; color:var(--grass); font-weight:800; font-size:.95rem; }
+  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:4px; }
+  .didit { flex:none; border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:.95rem; color:#fff; background:var(--grass); padding:12px 18px; border-radius:999px; box-shadow:0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition:transform .1s, background .2s; white-space:nowrap; }
+  .didit:hover { transform:translateY(-2px); } .didit:active { transform:translateY(2px); }
+  .didit.done { background:var(--ink-faint); box-shadow:0 4px 0 rgba(0,0,0,.2); cursor:default; }
+  .didit.done::before { content:"✓ "; }
+
+  .snack { background:var(--sun-soft); border:2px solid color-mix(in srgb, var(--sun) 45%, var(--line)); border-radius:16px; padding:14px 18px; margin:16px 0; }
+  .snack .h { font-weight:900; font-size:.85rem; letter-spacing:.04em; color:#8a6a00; margin-bottom:4px; }
+  @media (prefers-color-scheme: dark){ .snack .h{ color:var(--sun);} }
+  :root[data-theme="dark"] .snack .h { color:var(--sun); }
+  .snack p { margin:0; font-size:.96rem; color:var(--ink-soft); font-weight:500; }
+
+  /* troubleshooter */
+  .trouble { background:var(--coral-soft); border:2px solid color-mix(in srgb, var(--coral) 40%, var(--line)); border-radius:16px; padding:6px 18px; margin:14px 0; }
+  .trouble summary { cursor:pointer; font-weight:900; padding:12px 0; list-style:none; color:var(--coral); }
+  .trouble summary::-webkit-details-marker { display:none; }
+  .trouble summary::before { content:"🔧 "; }
+  .trouble ol { margin:0 0 14px; padding-left:22px; color:var(--ink); font-weight:500; font-size:.95rem; }
+  .trouble li { margin-bottom:8px; }
+  .trouble b { color:var(--ink); }
+
+  .celebrate { text-align:center; background:linear-gradient(180deg,var(--grape-soft),var(--card)); border-color:color-mix(in srgb, var(--grape) 40%, var(--line)); }
+  .celebrate.locked { opacity:.5; filter:grayscale(.6); }
+  .celebrate h2 { font-size:clamp(1.5rem,5vw,2.2rem); margin:0 0 6px; }
+  .badge { width:120px; height:120px; margin:8px auto 4px; display:grid; place-items:center; font-size:60px; background:var(--grape); border-radius:50%; box-shadow:var(--shadow-lg); border:5px solid #fff; }
+  .celebrate.unlocked .badge { animation:pop .6s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes pop { 0%{ transform:scale(0) rotate(-40deg);} 100%{ transform:scale(1) rotate(0);} }
+  .locktext { font-weight:700; color:var(--ink-faint); font-size:.95rem; }
+
+  .quizgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:620px){ .quizgrid{ grid-template-columns:1fr;} }
+  .flip { background:transparent; perspective:1000px; min-height:160px; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--ink); }
+  .flip-inner { position:relative; width:100%; height:100%; min-height:160px; transition:transform .5s; transform-style:preserve-3d; }
+  .flip.flipped .flip-inner { transform:rotateY(180deg); }
+  .flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:16px; padding:18px; display:flex; flex-direction:column; justify-content:center; text-align:left; border:2px solid var(--line); }
+  .flip-front { background:var(--sky-soft); }
+  .flip-front .q { font-weight:800; font-size:1rem; color:var(--ink); }
+  .flip-front .tap { margin-top:auto; font-size:.8rem; color:var(--ink-faint); font-weight:700; }
+  .flip-back { background:var(--grass-soft); transform:rotateY(180deg); }
+  .flip-back .a { font-weight:600; font-size:.92rem; color:var(--ink); }
+
+  .tomorrow { text-align:center; background:#221B33; color:#fff; border:none; }
+  .tomorrow .eyebrow { color:var(--coral); }
+  .tomorrow h2 { color:#fff; margin:6px 0; }
+  .tomorrow p { color:#cfc8dd; max-width:34ch; margin:0 auto; }
+  .lava { font-size:48px; animation:lavapulse 1.4s ease-in-out infinite; }
+  @keyframes lavapulse { 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 6px var(--coral)); } 50%{ transform:scale(1.15); filter:drop-shadow(0 0 18px var(--coral)); } }
+
+  .parent-note { font-size:.82rem; color:var(--ink-faint); text-align:center; max-width:62ch; margin:20px auto 60px; padding:0 20px; }
+  .parent-note b { color:var(--ink-soft); }
+
+  #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
+  :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+</style>
+
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="index.html" class="homebtn" aria-label="Back to Builder School home">🏠</a>
+    <span class="daychip">📢 Day 6</span>
+    <div class="xp-wrap"><div class="xp-fill" id="xpfill"></div></div>
+    <span class="xp-label"><b id="xpcount">0</b>/6 ⭐</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-block" aria-hidden="true"><span class="zzz">🌍</span><span class="spark">🎉</span></div>
+    <div class="eyebrow">Roblox Builder School</div>
+    <h1>Publish Your <span class="pop">Game!</span></h1>
+    <p class="hook">Today your game goes online. Real people can open it and play what YOU made.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card meet">
+    <svg class="fundi" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h3>This is a big day, Builder! 🐦</h3>
+      <p>You made a whole game. Blocks, lava, coins, jumps. But right now it only lives on YOUR computer. Fundi the weaver bird builds a nest, then shows the whole flock. Today you do the same. You send your game to Roblox, and it becomes a real game people can open on their phones. No code today. Just sharing your work with the world. <span class="say">Hongera! You did it.</span></p>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">1</span><span class="lab">Publish it</span></div>
+    <h2>Send your game to Roblox</h2>
+    <p>"Publish" means send your game to Roblox. Roblox keeps it on their own big computers. Then the game is online, day and night, even when your computer is off. And it is <b>free</b>. You do not pay anything.</p>
+    <div class="stage">
+      <div class="wd">
+        <div class="panel when"><div class="t">YOUR PC</div><div class="e">💻</div><div style="font-size:.8rem;font-weight:700;">your game</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel do"><div class="t">PUBLISH</div><div class="e">☁️</div><div style="font-size:.8rem;font-weight:700;">Roblox keeps it</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel when"><div class="t">ONLINE</div><div class="e">🌍</div><div style="font-size:.8rem;font-weight:700;">always on</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>At the top, click <b>File</b>.</li>
+          <li>Click <b>Publish to Roblox As...</b></li>
+          <li>Type a name for your game.</li>
+          <li>Click the <b>Create</b> button.</li>
+          <li>Wait a moment. It saves to Roblox.</li>
+        </ol>
+        <p class="after">Your game is now online! 🎉</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Publishing is free</div>
+      <p>You do not need money to put a game online. Roblox keeps your game on their computers for free. Big games and tiny games all sit there the same way. Your game is a real one now.</p>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">2</span><span class="lab">Who can play</span></div>
+    <h2>Private or Public? Start Private.</h2>
+    <p>Your game has a setting for who can open it. There are two choices. <b>Private</b> means only YOU can play. <b>Public</b> means anyone in the world can play. Start with <b>Private</b>. You can change it to Public later, when you feel ready.</p>
+    <div class="stage">
+      <div class="treecmp">
+        <div class="treebox good">
+          <div class="cap">🔒 Private (start here)</div>
+          <div class="trow">Only you can open it</div>
+          <div class="trow ind1">Safe to test</div>
+          <div class="trow ind1">Nobody else sees it yet</div>
+        </div>
+        <div class="treebox bad" style="border-color:var(--sky);">
+          <div class="cap" style="color:var(--sky);">🌍 Public (later)</div>
+          <div class="trow">Anyone can open it</div>
+          <div class="trow ind1">Family can play</div>
+          <div class="trow ind1">Friends can play</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>For now, leave your game <b>Private</b>.</li>
+          <li>Say out loud what Private means.</li>
+          <li>Say out loud what Public means.</li>
+        </ol>
+        <p class="after">Private now. Public soon. 🔒</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">3</span><span class="lab">Play on phone</span></div>
+    <h2>Open your game on your phone 📱</h2>
+    <p>Here is the fun part. Your game is online now, so you can play it on the normal Roblox app, just like any other game. You built it, and now you play it like a real player. Sign in with the same account you use in Studio.</p>
+    <div class="stage">
+      <div style="text-align:center;">
+        <div style="font-size:48px;">📱</div>
+        <div style="font-weight:900; color:var(--grape); margin-top:6px;">Your game. On your phone.</div>
+        <div style="font-size:.85rem; color:var(--ink-soft); font-weight:700; margin-top:4px;">You made this!</div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Open the normal <b>Roblox app</b> on your phone.</li>
+          <li>Sign in with your account.</li>
+          <li>Tap your <b>profile</b>, then <b>Creations</b>.</li>
+          <li>Find your game and tap it.</li>
+          <li>Play the game you built!</li>
+        </ol>
+        <p class="after">You are playing your own game. Wow. 🎮</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: You are a maker now</div>
+      <p>Most people only play games. You MAKE them. The block, the lava, the coins, they came from your hands. Playing your own game on a phone is a feeling few people ever get. Enjoy it.</p>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">4</span><span class="lab">Make it nice</span></div>
+    <h2>Give it a fun name and a picture</h2>
+    <p>A game needs a good <b>name</b> so people want to open it. Pick something fun, like "Lava Jump Run" or "Coin Chase". You can also add a small <b>icon</b>. That is the little picture people see before they play. It is not a must, but it makes your game look nice and finished.</p>
+    <div class="stage">
+      <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;">
+        <div style="width:70px; height:70px; border-radius:16px; background:var(--grape); display:grid; place-items:center; font-size:34px; box-shadow:var(--shadow);">🌋</div>
+        <div style="text-align:left;">
+          <div style="font-weight:900; font-size:1.1rem;">Lava Jump Run</div>
+          <div style="font-size:.85rem; color:var(--ink-soft); font-weight:700;">By you 🐦</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Think of a fun name for your game.</li>
+          <li>In Studio, open <b>File</b>, then <b>Game Settings</b>.</li>
+          <li>Type your new name.</li>
+          <li>If you like, add a small picture as the icon.</li>
+          <li>Click <b>Save</b>.</li>
+        </ol>
+        <p class="after">Now it looks like a real game. ✨</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">5</span><span class="lab">Go Public</span></div>
+    <h2>Turn it Public when you are ready</h2>
+    <p>Feeling ready? Now flip the switch to <b>Public</b>. This opens the door. Now your family and friends can play too, not just you. Do this when your game feels done and you are happy to show it.</p>
+    <div class="stage">
+      <div class="wd">
+        <div class="panel when"><div class="t">NOW</div><div class="e">🔒</div><div style="font-size:.8rem;font-weight:700;">Private</div></div>
+        <div class="arrow">➜</div>
+        <div class="panel do"><div class="t">FLIP IT</div><div class="e">🌍</div><div style="font-size:.8rem;font-weight:700;">Public</div></div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>In Studio, open <b>File</b>, then <b>Game Settings</b>.</li>
+          <li>Find the <b>Permissions</b> or <b>Playability</b> part.</li>
+          <li>Change it from <b>Private</b> to <b>Public</b>.</li>
+          <li>Click <b>Save</b>.</li>
+        </ol>
+        <p class="after">The door is open. Anyone can play now. 🌍</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Private and Public in one line</div>
+      <p>Private is a closed door, only you go in. Public is an open door, anyone can walk in. Same game. You just choose who gets to play. You can switch back any time.</p>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">6</span><span class="lab">Share it</span></div>
+    <h2>Send the link to your family 💌</h2>
+    <p>Last step, and the best one. Copy your game's link and send it to family. Then sit next to them and watch someone play the game you made. That is a big, real moment. Be proud.</p>
+    <p style="font-weight:700; color:var(--ink);">One honest thing: strangers may not find your game right away. That is totally normal for a new game. It does not mean it is bad. The real win today is that your game is <b>live</b>, and someone you love gets to play it.</p>
+    <div class="stage">
+      <div style="text-align:center;">
+        <div style="font-size:44px;">👨‍👩‍👧‍👦</div>
+        <div style="font-weight:900; color:var(--grape); margin-top:6px;">Watch them play YOUR game</div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Open your game page on Roblox.</li>
+          <li>Copy the <b>link</b> (the web address).</li>
+          <li>Send it to a family member.</li>
+          <li>Ask them to open it and play.</li>
+          <li>Sit next to them and watch. Smile. 😄</li>
+        </ol>
+        <p class="after">Someone is playing what you built. That is the win. 🏆</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Shipping is the real prize</div>
+      <p>"Ship it" means put your work out in the world. Many people make things but never share them. You did. Even if only one person plays it today, you finished AND you shared. That is what real makers do.</p>
+    </div>
+  </section>
+
+  <!-- CELEBRATION -->
+  <section class="card celebrate locked" id="celebrate">
+    <div class="badge" id="badge">🔒</div>
+    <h2 id="celebTitle">Finish all 6 steps to earn your badge</h2>
+    <p id="celebText" class="locktext">Tick off each "I did it!" as you go. Your Day 6 Publisher Badge is waiting.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section>
+    <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it.</p>
+    <div class="quizgrid">
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">How much does it cost to publish your game?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Nothing. It is free. Roblox keeps your game on their computers for you.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What does <b>Private</b> mean?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Only you can play. It is like a closed door. Start here, then go Public when you are ready.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Which menu do you use to publish?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">The <b>File</b> menu at the top. Then click <b>Publish to Roblox As...</b></div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">No strangers played your game yet. Is that bad?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">No! That is normal for a new game. The real win is that it is live and your family can play it.</div></div></div></button>
+    </div>
+  </section>
+
+  <!-- TOMORROW -->
+  <section class="card tomorrow">
+    <div class="eyebrow">🔮 Tomorrow · Day 7</div>
+    <div class="lava">🏆</div>
+    <h2>You build a Scoreboard</h2>
+    <p>Your game is live. Now let us count the Wins! Tomorrow you make a scoreboard that goes up every time a player wins. Numbers on the screen. Real points.</p>
+  </section>
+
+  <p class="parent-note">
+    <b>For the parent:</b> today is a milestone, so the win is not a perfect game, it is that he <b>shipped</b> something real and can share it. Please help with the account sign-in and the phone step, and sit with him when a family member opens the link. If no strangers play yet, that is completely normal for a brand-new game, and it is worth telling him so out loud. The lesson today is pride in finishing and courage in sharing, not popularity.
+  </p>
+
+</main>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DAY = 'day6';
+    var steps = document.querySelectorAll('[data-step]');
+    var total = steps.length;
+    var done = 0;
+    var fill = document.getElementById('xpfill');
+    var count = document.getElementById('xpcount');
+    var celebrate = document.getElementById('celebrate');
+    var badge = document.getElementById('badge');
+    var celebTitle = document.getElementById('celebTitle');
+    var celebText = document.getElementById('celebText');
+
+    function loadProgress(){ try { return JSON.parse(localStorage.getItem('rbs_progress') || '{}'); } catch (e) { return {}; } }
+    function saveProgress(p){ try { localStorage.setItem('rbs_progress', JSON.stringify(p)); } catch (e) {} }
+    function recordStep(idx){ var p = loadProgress(); p[DAY] = p[DAY] || { steps: [], done: false }; if (p[DAY].steps.indexOf(idx) === -1) p[DAY].steps.push(idx); if (p[DAY].steps.length >= total) p[DAY].done = true; saveProgress(p); }
+
+    steps.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('done')) return;
+        markDone(btn); recordStep(idx); smallPop(btn);
+        if (done === total) finish(true);
+      });
+    });
+    function markDone(btn){ btn.classList.add('done'); btn.textContent = 'Done!'; done++; fill.style.width = Math.round((done/total)*100) + '%'; count.textContent = done; }
+    (function restore(){ var p = loadProgress(); var saved = (p[DAY] && p[DAY].steps) || []; steps.forEach(function (btn, idx){ if (saved.indexOf(idx) !== -1) markDone(btn); }); if (done === total) finish(false); })();
+
+    function finish(animate){
+      celebrate.classList.remove('locked'); celebrate.classList.add('unlocked');
+      badge.textContent = '🎉';
+      celebTitle.textContent = 'YOU DID IT! Day 6 Publisher Badge earned 🎉';
+      celebText.className = '';
+      celebText.textContent = 'Your game is online! It lives on Roblox now, free, day and night. You published it, you played it on your phone, you gave it a fun name, and you shared the link with family. That is a real game made by a real maker: you. Not many people ever ship a game. You just did. Be proud, Builder. See you on Day 7 for the scoreboard!';
+      var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
+      if (animate){ celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); if (!reduce) confettiBurst(); }
+    }
+    function smallPop(el){ if (reduce) return; el.animate([{ transform:'scale(1)' },{ transform:'scale(1.15)' },{ transform:'scale(1)' }], { duration:260, easing:'ease-out' }); }
+
+    document.querySelectorAll('.flip').forEach(function (f){ f.addEventListener('click', function(){ f.classList.toggle('flipped'); }); });
+
+    function confettiBurst(){
+      var cv = document.getElementById('confetti'); var ctx = cv.getContext('2d');
+      var W = cv.width = window.innerWidth, H = cv.height = window.innerHeight;
+      var cols = ['#FF5A47','#2E9BF0','#2FB35C','#FFC531','#8B5CF6']; var bits = [];
+      for (var i=0;i<140;i++){ bits.push({ x:W/2, y:H/3, vx:(Math.random()-0.5)*14, vy:Math.random()*-15-4, s:6+Math.random()*8, c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-0.5)*0.4 }); }
+      var t=0;
+      function frame(){ ctx.clearRect(0,0,W,H); t++; bits.forEach(function(p){ p.vy+=0.4; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); if (t<160) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H); }
+      frame();
+    }
+  })();
+</script>

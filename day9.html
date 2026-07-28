@@ -1,0 +1,468 @@
+<title>Day 9 · Collect the Coins</title>
+<style>
+  :root {
+    --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun:#FFC531; --sky:#2E9BF0; --grass:#2FB35C; --coral:#FF5A47; --grape:#8B5CF6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10);
+    --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16);
+    --r:22px; --maxw:880px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+      --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+      --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+  }
+  :root[data-theme="light"] { --paper:#FFF7EA; --card:#FFFFFF; --ink:#221B33; --ink-soft:#5A5170; --ink-faint:#8B84A0; --line:#EFE6D6;
+    --sun-soft:#FFF1CC; --sky-soft:#DCEFFF; --grass-soft:#D6F5E1; --coral-soft:#FFE1DC; --grape-soft:#EBE3FF;
+    --shadow:0 2px 0 rgba(34,27,51,.06), 0 12px 28px rgba(34,27,51,.10); --shadow-lg:0 4px 0 rgba(34,27,51,.08), 0 22px 44px rgba(34,27,51,.16); }
+  :root[data-theme="dark"] { --paper:#14121C; --card:#1E1B29; --ink:#F3EFFA; --ink-soft:#B9B2CC; --ink-faint:#8B84A0; --line:#2C2839;
+    --sun-soft:#33280E; --sky-soft:#10283D; --grass-soft:#10301E; --coral-soft:#351712; --grape-soft:#211838;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45); --shadow-lg:0 4px 0 rgba(0,0,0,.35), 0 22px 44px rgba(0,0,0,.55); }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:18px; overflow-x:hidden; }
+  .mono { font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:0 20px; }
+
+  .topbar { position:sticky; top:0; z-index:60; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(8px); border-bottom:2px solid var(--line); }
+  .topbar .wrap { display:flex; align-items:center; gap:14px; height:58px; }
+  .homebtn { flex:none; width:40px; height:40px; border-radius:12px; background:var(--card); border:2px solid var(--line); display:grid; place-items:center; text-decoration:none; font-size:18px; }
+  .homebtn:hover { border-color:var(--sky); }
+  .daychip { font-weight:800; font-size:15px; background:var(--grape); color:#fff; padding:5px 12px; border-radius:999px; white-space:nowrap; }
+  .xp-wrap { flex:1; height:16px; background:var(--line); border-radius:999px; overflow:hidden; }
+  .xp-fill { height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--grape),var(--coral)); transition:width .5s cubic-bezier(.2,.9,.3,1.2); }
+  .xp-label { font-weight:800; font-size:14px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .xp-label b { color:var(--grape); }
+
+  .hero { position:relative; padding:38px 0 16px; text-align:center; }
+  .hero-block { width:88px; height:88px; margin:0 auto 6px; border-radius:18px; background:#8a8f9c; box-shadow:var(--shadow-lg); position:relative; animation:wake 4s ease-in-out infinite; }
+  @keyframes wake { 0%,55%{ background:#8a8f9c; transform:scale(1);} 65%{ background:var(--coral); transform:scale(1.12);} 85%{ background:var(--coral);} 100%{ background:#8a8f9c;} }
+  .hero-block .zzz { position:absolute; top:-22px; right:-8px; font-size:20px; animation:zzz 4s ease-in-out infinite; }
+  @keyframes zzz { 0%,50%{ opacity:1;} 60%,100%{ opacity:0;} }
+  .hero-block .spark { position:absolute; inset:0; display:grid; place-items:center; font-size:34px; opacity:0; animation:spark 4s ease-in-out infinite; }
+  @keyframes spark { 0%,58%{ opacity:0; transform:scale(.4);} 66%{ opacity:1; transform:scale(1);} 84%{ opacity:1;} 90%,100%{ opacity:0;} }
+  .eyebrow { font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--grape); font-size:13px; }
+  h1 { font-size:clamp(2rem,6.5vw,3.2rem); line-height:1.02; margin:8px 0 0; font-weight:900; letter-spacing:-.02em; text-wrap:balance; }
+  h1 .pop { color:var(--coral); }
+  .hook { font-size:clamp(1.05rem,2.6vw,1.28rem); color:var(--ink-soft); max-width:32ch; margin:14px auto 0; font-weight:600; }
+
+  section { padding:14px 0; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:24px; margin:16px 0; }
+
+  .fundi { width:88px; height:88px; flex:none; animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+  .meet { display:flex; gap:18px; align-items:center; background:var(--sun-soft); border-color:color-mix(in srgb, var(--sun) 40%, var(--line)); }
+  .meet h3 { margin:0 0 4px; font-size:1.2rem; }
+  .meet p { margin:0; font-size:.95rem; color:var(--ink-soft); }
+  .meet .say { font-weight:800; color:#8a6a00; }
+  @media (prefers-color-scheme: dark){ .meet .say{ color:var(--sun);} }
+  :root[data-theme="dark"] .meet .say { color:var(--sun); }
+
+  .step-num { display:inline-flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .step-num .n { width:40px; height:40px; border-radius:12px; background:var(--grape); color:#fff; font-weight:900; font-size:20px; display:grid; place-items:center; box-shadow:var(--shadow); }
+  .step-num .lab { font-weight:800; letter-spacing:.1em; text-transform:uppercase; font-size:12px; color:var(--ink-faint); }
+  .step h2 { font-size:clamp(1.35rem,4vw,1.85rem); margin:2px 0 10px; font-weight:900; letter-spacing:-.01em; text-wrap:balance; }
+  .step p { margin:0 0 12px; color:var(--ink-soft); font-weight:500; }
+  .step p b, .step li b { color:var(--ink); }
+
+  .stage { background:linear-gradient(180deg,var(--grape-soft),transparent); border:2px dashed color-mix(in srgb, var(--grape) 35%, var(--line)); border-radius:16px; min-height:150px; display:grid; place-items:center; margin:8px 0 16px; padding:18px; overflow:hidden; }
+
+  /* code box (always dark, like a real editor) */
+  .code { position:relative; background:#191527; border:2px solid #2c2740; border-radius:14px; margin:6px 0 14px; overflow-x:auto; box-shadow:var(--shadow); }
+  .code .bar { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid #2c2740; }
+  .code .bar i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .code pre { margin:0; padding:16px 18px; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:15px; line-height:1.7; color:#EDE9FA; white-space:pre; }
+  .code .kw { color:#FF8FB0; } .code .fn { color:#7FD1FF; } .code .str { color:#8CE0B0; } .code .num { color:#FFC96B; } .code .cm { color:#8B84A0; }
+  .code.new { border-color:var(--grape); box-shadow:0 0 0 3px color-mix(in srgb, var(--grape) 25%, transparent); }
+  .newtag { position:absolute; top:-11px; right:14px; background:var(--grape); color:#fff; font-weight:800; font-size:10.5px; letter-spacing:.08em; padding:3px 9px; border-radius:999px; }
+  .typehint { font-size:.82rem; color:var(--ink-faint); font-weight:600; margin:-6px 0 12px; }
+  .typehint b { color:var(--coral); }
+
+  .keycap { display:inline-grid; place-items:center; min-width:26px; height:26px; padding:0 6px; border-radius:7px; background:var(--card); border:1.5px solid var(--line); border-bottom-width:3px; font-weight:900; font-size:13px; font-family:ui-monospace,monospace; color:var(--ink-soft); vertical-align:middle; }
+
+  /* when-do panels */
+  .wd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .wd .panel { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px 18px; text-align:center; min-width:120px; box-shadow:var(--shadow); }
+  .wd .panel .t { font-weight:900; font-size:11px; letter-spacing:.1em; color:var(--ink-faint); }
+  .wd .panel .e { font-size:34px; }
+  .wd .arrow { font-size:26px; color:var(--grape); font-weight:900; }
+  .wd .when .t { color:var(--sky); } .wd .do .t { color:var(--coral); }
+
+  /* explorer tick/x */
+  .treecmp { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; }
+  .treebox { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:14px; flex:1; min-width:200px; }
+  .treebox.good { border-color:var(--grass); } .treebox.bad { border-color:var(--coral); }
+  .treebox .cap { font-weight:900; font-size:.85rem; margin-bottom:8px; }
+  .treebox.good .cap { color:var(--grass); } .treebox.bad .cap { color:var(--coral); }
+  .trow { padding:5px 8px; font-weight:700; font-size:.9rem; }
+  .trow.ind1 { margin-left:16px; color:var(--ink-soft); } .trow.ind2 { margin-left:34px; color:var(--ink-soft); }
+
+  .yourturn { background:var(--grass-soft); border:2px solid color-mix(in srgb, var(--grass) 40%, var(--line)); border-radius:16px; padding:16px 18px; display:flex; gap:14px; align-items:center; }
+  .yourturn .txt { flex:1; } .yourturn .txt p { margin:0; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt ol { margin:2px 0 0; padding-left:22px; }
+  .yourturn .txt li { margin-bottom:5px; color:var(--ink); font-weight:600; font-size:.98rem; }
+  .yourturn .txt .after { margin:6px 0 0; color:var(--grass); font-weight:800; font-size:.95rem; }
+  .yourturn .kick { font-weight:900; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--grass); display:block; margin-bottom:4px; }
+  .didit { flex:none; border:none; cursor:pointer; font-family:inherit; font-weight:900; font-size:.95rem; color:#fff; background:var(--grass); padding:12px 18px; border-radius:999px; box-shadow:0 4px 0 color-mix(in srgb, var(--grass) 55%, #000); transition:transform .1s, background .2s; white-space:nowrap; }
+  .didit:hover { transform:translateY(-2px); } .didit:active { transform:translateY(2px); }
+  .didit.done { background:var(--ink-faint); box-shadow:0 4px 0 rgba(0,0,0,.2); cursor:default; }
+  .didit.done::before { content:"✓ "; }
+
+  .snack { background:var(--sun-soft); border:2px solid color-mix(in srgb, var(--sun) 45%, var(--line)); border-radius:16px; padding:14px 18px; margin:16px 0; }
+  .snack .h { font-weight:900; font-size:.85rem; letter-spacing:.04em; color:#8a6a00; margin-bottom:4px; }
+  @media (prefers-color-scheme: dark){ .snack .h{ color:var(--sun);} }
+  :root[data-theme="dark"] .snack .h { color:var(--sun); }
+  .snack p { margin:0; font-size:.96rem; color:var(--ink-soft); font-weight:500; }
+
+  /* troubleshooter */
+  .trouble { background:var(--coral-soft); border:2px solid color-mix(in srgb, var(--coral) 40%, var(--line)); border-radius:16px; padding:6px 18px; margin:14px 0; }
+  .trouble summary { cursor:pointer; font-weight:900; padding:12px 0; list-style:none; color:var(--coral); }
+  .trouble summary::-webkit-details-marker { display:none; }
+  .trouble summary::before { content:"🔧 "; }
+  .trouble ol { margin:0 0 14px; padding-left:22px; color:var(--ink); font-weight:500; font-size:.95rem; }
+  .trouble li { margin-bottom:8px; }
+  .trouble b { color:var(--ink); }
+
+  .celebrate { text-align:center; background:linear-gradient(180deg,var(--grape-soft),var(--card)); border-color:color-mix(in srgb, var(--grape) 40%, var(--line)); }
+  .celebrate.locked { opacity:.5; filter:grayscale(.6); }
+  .celebrate h2 { font-size:clamp(1.5rem,5vw,2.2rem); margin:0 0 6px; }
+  .badge { width:120px; height:120px; margin:8px auto 4px; display:grid; place-items:center; font-size:60px; background:var(--grape); border-radius:50%; box-shadow:var(--shadow-lg); border:5px solid #fff; }
+  .celebrate.unlocked .badge { animation:pop .6s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes pop { 0%{ transform:scale(0) rotate(-40deg);} 100%{ transform:scale(1) rotate(0);} }
+  .locktext { font-weight:700; color:var(--ink-faint); font-size:.95rem; }
+
+  .quizgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:620px){ .quizgrid{ grid-template-columns:1fr;} }
+  .flip { background:transparent; perspective:1000px; min-height:160px; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--ink); }
+  .flip-inner { position:relative; width:100%; height:100%; min-height:160px; transition:transform .5s; transform-style:preserve-3d; }
+  .flip.flipped .flip-inner { transform:rotateY(180deg); }
+  .flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:16px; padding:18px; display:flex; flex-direction:column; justify-content:center; text-align:left; border:2px solid var(--line); }
+  .flip-front { background:var(--sky-soft); }
+  .flip-front .q { font-weight:800; font-size:1rem; color:var(--ink); }
+  .flip-front .tap { margin-top:auto; font-size:.8rem; color:var(--ink-faint); font-weight:700; }
+  .flip-back { background:var(--grass-soft); transform:rotateY(180deg); }
+  .flip-back .a { font-weight:600; font-size:.92rem; color:var(--ink); }
+
+  .tomorrow { text-align:center; background:#221B33; color:#fff; border:none; }
+  .tomorrow .eyebrow { color:var(--coral); }
+  .tomorrow h2 { color:#fff; margin:6px 0; }
+  .tomorrow p { color:#cfc8dd; max-width:34ch; margin:0 auto; }
+  .lava { font-size:48px; animation:lavapulse 1.4s ease-in-out infinite; }
+  @keyframes lavapulse { 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 6px var(--coral)); } 50%{ transform:scale(1.15); filter:drop-shadow(0 0 18px var(--coral)); } }
+
+  .parent-note { font-size:.82rem; color:var(--ink-faint); text-align:center; max-width:62ch; margin:20px auto 60px; padding:0 20px; }
+  .parent-note b { color:var(--ink-soft); }
+
+  #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
+  :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+</style>
+
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="index.html" class="homebtn" aria-label="Back to Builder School home">🏠</a>
+    <span class="daychip">🪙 Day 9</span>
+    <div class="xp-wrap"><div class="xp-fill" id="xpfill"></div></div>
+    <span class="xp-label"><b id="xpcount">0</b>/6 ⭐</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-block" style="background:var(--sun); border-radius:50%;" aria-hidden="true"><span class="spark">🪙</span></div>
+    <div class="eyebrow">Roblox Builder School</div>
+    <h1>Collect the <span class="pop">Coins!</span></h1>
+    <p class="hook">Today you make a shiny coin. Touch it, you get 1 point, and it disappears.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card meet">
+    <svg class="fundi" viewBox="0 0 100 100" role="img" aria-label="Fundi the weaver bird">
+      <ellipse cx="50" cy="88" rx="26" ry="5" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 55 Q50 30 70 55 Q72 78 50 82 Q28 78 30 55Z" fill="#FFC531"/>
+      <circle cx="50" cy="44" r="19" fill="#FFC531"/>
+      <path d="M40 40 Q50 30 60 40 Q60 48 50 50 Q40 48 40 40Z" fill="#2a2233"/>
+      <circle cx="44" cy="42" r="3.4" fill="#fff"/><circle cx="45" cy="42" r="1.7" fill="#221B33"/>
+      <path d="M60 44 L72 41 L60 49Z" fill="#FF8A3D"/>
+      <path d="M66 60 Q80 58 78 70 Q70 70 66 64Z" fill="#F0A81E"/>
+      <path d="M46 82 L44 92 M54 82 L56 92" stroke="#F0A81E" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h3>Karibu back, Builder! 🐦</h3>
+      <p>On Day 7 you made a scoreboard. It shows <b>Wins</b> at the top. Today Fundi wants shiny coins in your game. You touch a coin, your points go up by 1, and the coin vanishes. Like picking a ripe mango from a tree: you take it, and it is gone from the branch. Good news: you already know the touch trick from before. <span class="say">Twende!</span></p>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">1</span><span class="lab">Add Coins</span></div>
+    <h2>Add a "Coins" number to your scoreboard</h2>
+    <p>On Day 7 you made a scoreboard with <b>Wins</b>. Now add one more number next to it, called <b>Coins</b>. Open your join-script in <b>ServerScriptService</b>. Find where you made <b>Wins</b>. Just under it, add this. It looks just like Wins, but the name is <b>Coins</b>.</p>
+    <div class="code new"><span class="newtag">NEW LINES</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> coins = Instance.<span class="fn">new</span>(<span class="str">"IntValue"</span>)
+coins.Name = <span class="str">"Coins"</span>
+coins.Value = <span class="num">0</span>
+coins.Parent = leaderstats</pre></div>
+    <p>Read it slow: "Make a new number. Call it <b>Coins</b>. Start it at <b>0</b>. Put it in the scoreboard." An <b>IntValue</b> is a box that holds a whole number, like 0, 1, or 5.</p>
+    <p class="typehint">Capital <b>C</b> in <span class="mono">"Coins"</span>. This name must match everywhere. Get it the same each time.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Open your join-script in <b>ServerScriptService</b>.</li>
+          <li>Find your <b>Wins</b> lines.</li>
+          <li>Add the 4 <b>Coins</b> lines under them.</li>
+          <li>Press <b>Play</b>. Look at the top. Do you see <b>Coins</b> next to Wins?</li>
+        </ol>
+        <p class="after">Now your scoreboard has two numbers! 🪙</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">2</span><span class="lab">Make a coin</span></div>
+    <h2>Build a yellow coin with a Script inside</h2>
+    <p>A coin is just a <b>Part</b>. Make it yellow and round so it looks like a coin. Then put a <b>Script</b> inside the coin. Same as always: the note goes inside the block that follows it.</p>
+    <div class="stage">
+      <div class="treecmp">
+        <div class="treebox good">
+          <div class="cap">✅ Do this: Script INSIDE the coin</div>
+          <div class="trow">📦 Workspace</div>
+          <div class="trow ind1">🪙 Coin</div>
+          <div class="trow ind2">📜 Script</div>
+        </div>
+        <div class="treebox bad">
+          <div class="cap">❌ Not this: Script next to the coin</div>
+          <div class="trow">📦 Workspace</div>
+          <div class="trow ind1">🪙 Coin</div>
+          <div class="trow ind1">📜 Script</div>
+        </div>
+      </div>
+    </div>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Make a new <b>Part</b>.</li>
+          <li>Change its <b>Shape</b> to <b>Cylinder</b> so it looks like a coin.</li>
+          <li>Change its <b>Color</b> to yellow.</li>
+          <li>Rename the Part to <b>Coin</b>.</li>
+          <li>Put a <b>Script</b> inside the Coin.</li>
+        </ol>
+        <p class="after">A shiny coin, waiting for you. 🪙</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: The touch trick again</div>
+      <p>A coin uses the SAME touch pattern you already know: WHEN the player touches it, DO something. You are not learning a brand new thing today. You are using an old friend for a new job.</p>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">3</span><span class="lab">Find the player</span></div>
+    <h2>On touch, find out who touched the coin</h2>
+    <p>Open the coin's Script. Delete everything in it. Type these lines. First we name the coin. Then we wait for a touch and find the player who touched it.</p>
+    <div class="code new"><span class="newtag">NEW LINES</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> coin = script.Parent
+
+coin.Touched:<span class="fn">Connect</span>(<span class="kw">function</span>(otherPart)
+    <span class="kw">local</span> player = game.Players:<span class="fn">GetPlayerFromCharacter</span>(otherPart.Parent)
+<span class="kw">end</span>)</pre></div>
+    <p>In kid words: "This is my <b>coin</b>. WHEN something touches it, look at that thing and ask: is this a <b>player</b>?" <span class="mono">GetPlayerFromCharacter</span> is a helper. It checks the thing that touched the coin and hands you the player.</p>
+    <p class="typehint">Careful with capitals: <span class="mono">Touched</span>, <span class="mono">Connect</span>, <span class="mono">Players</span>, <span class="mono">GetPlayerFromCharacter</span>.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Type these lines in the coin's Script.</li>
+          <li>Go slow. Get the capital letters right.</li>
+          <li>Do not press Play yet. We add more next.</li>
+        </ol>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">4</span><span class="lab">Add and vanish</span></div>
+    <h2>Add 1 coin, then make it disappear</h2>
+    <p>Now the fun part. If it really was a player, add <b>1</b> to their Coins. Then tell the coin to disappear. Add these lines inside, like this:</p>
+    <div class="code new"><span class="newtag">NEW LINES</span><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="kw">local</span> coin = script.Parent
+
+coin.Touched:<span class="fn">Connect</span>(<span class="kw">function</span>(otherPart)
+    <span class="kw">local</span> player = game.Players:<span class="fn">GetPlayerFromCharacter</span>(otherPart.Parent)
+    <span class="kw">if</span> player <span class="kw">then</span>
+        player.leaderstats.Coins.Value = player.leaderstats.Coins.Value + <span class="num">1</span>
+        coin:<span class="fn">Destroy</span>()
+    <span class="kw">end</span>
+<span class="kw">end</span>)</pre></div>
+    <p>The <b>if player then</b> line means "only do this if a real player touched it, not a wall or the floor." The next line takes their Coins and adds 1. Then <span class="mono">coin:Destroy()</span> removes the coin from the game.</p>
+    <p class="typehint">The name <span class="mono">Coins</span> here must match the <span class="mono">"Coins"</span> from Step 1 exactly. Same word, same capital <b>C</b>.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Add the <b>if player then</b> line.</li>
+          <li>Add the line that adds <b>1</b> to Coins.</li>
+          <li>Add the <span class="mono">coin:Destroy()</span> line.</li>
+          <li>Add both <b>end</b> lines at the bottom.</li>
+        </ol>
+        <p class="after">Read it out loud like a story before you Play.</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Destroy means gone for good</div>
+      <p><span class="mono">Destroy</span> removes a thing from the game for good. That is WHY you cannot grab the coin twice: after you touch it, the coin is not there anymore. It is like eating a mandazi. Once it is gone, it is gone.</p>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">5</span><span class="lab">Play it</span></div>
+    <h2>Touch the coin. Watch Coins go up. 🪙</h2>
+    <p>The moment! Press <b>Play</b> and walk your character into the coin. Look at the top of the screen. Did <b>Coins</b> go from 0 to 1? And did the coin disappear? That was your code. You made a coin you can collect.</p>
+    <div class="stage">
+      <div style="position:relative; width:100%; height:110px;">
+        <div style="position:absolute; bottom:18px; left:0; right:0; height:6px; background:var(--grass); border-radius:3px;"></div>
+        <div style="position:absolute; bottom:26px; right:22%; font-size:38px; animation:spin 3.4s ease-in-out infinite;">🪙</div>
+        <div style="position:absolute; bottom:22px; font-size:32px; animation:runacross 3.4s ease-in-out infinite;">🏃</div>
+      </div>
+    </div>
+    <style>@keyframes runacross { 0%{left:4%;} 55%{left:66%;} 100%{left:4%;} } @keyframes spin { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.15) rotate(12deg);} }</style>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Press <b>Play</b>. Walk into the coin.</li>
+          <li>Did <b>Coins</b> go up by 1? 🪙</li>
+          <li>Did the coin disappear?</li>
+          <li>Try to touch that spot again. There is nothing there now. Good!</li>
+        </ol>
+        <p class="after">You made a real coin, just like big games!</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <details class="trouble">
+      <summary>Coins did not go up? Tap here, do not panic</summary>
+      <ol>
+        <li><b>Is the Script INSIDE the coin?</b> Check the Explorer. The Script must sit under your Coin (Step 2), not next to it.</li>
+        <li><b>Does the name match?</b> The <span class="mono">Coins</span> in the coin script must match the <span class="mono">"Coins"</span> in your join-script. Same word, same capital <b>C</b>. If one says <span class="mono">Coin</span> and the other says <span class="mono">Coins</span>, it will not work.</li>
+        <li><b>Look for red text in the Output window.</b> Red text is the computer HELPING you. It points at the exact line with the problem. Check that line for a tiny typo.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card step">
+    <div class="step-num"><span class="n">6</span><span class="lab">Many coins</span></div>
+    <h2>Fill your game with coins</h2>
+    <p>One coin is fun. Ten coins is a game! You do not need to write the code again. Just <b>copy</b> the coin you made. Each copy already has the Script inside it, so each copy works on its own.</p>
+    <div class="yourturn">
+      <div class="txt"><span class="kick">Your turn</span>
+        <ol>
+          <li>Click your <b>Coin</b> in the Explorer.</li>
+          <li>Press <span class="keycap">Ctrl</span> <span class="keycap">D</span> to copy it. (On Mac, <span class="keycap">Cmd</span> <span class="keycap">D</span>.)</li>
+          <li>Move the new coin to a new spot.</li>
+          <li>Do it again and again. Put coins all around your obby.</li>
+          <li>Press <b>Play</b>. Run around and collect them all!</li>
+        </ol>
+        <p class="after">Watch your Coins number climb! 🪙🪙🪙</p>
+      </div>
+      <button class="didit" data-step>I did it!</button>
+    </div>
+    <div class="snack">
+      <div class="h">🍌 BRAIN SNACK: Copy is your super power</div>
+      <p>When you copy a coin, you copy the Script inside it too. So one bit of code you wrote now runs in 20 places at once. Good coders write a thing once, then reuse it many times. That is smart, not lazy.</p>
+    </div>
+  </section>
+
+  <!-- CELEBRATION -->
+  <section class="card celebrate locked" id="celebrate">
+    <div class="badge" id="badge">🔒</div>
+    <h2 id="celebTitle">Finish all 6 steps to earn your badge</h2>
+    <p id="celebText" class="locktext">Tick off each "I did it!" as you go. Your Day 9 Coin Collector Badge is waiting.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section>
+    <h2 style="text-align:center; font-size:1.5rem; margin:24px 0 4px;">🧠 Check Yourself</h2>
+    <p style="text-align:center; color:var(--ink-soft); margin:0 0 16px; font-weight:600;">Tap a card to flip it.</p>
+    <div class="quizgrid">
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">What does <span class="mono">coin:Destroy()</span> do?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">It removes the coin from the game for good. That is why you cannot grab the same coin twice.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Why do we write <span class="mono">if player then</span>?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">So we only add a coin when a real player touches it, not when a wall or the floor touches it.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Where must the coin's Script live?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">Inside the Coin Part. If it sits next to the coin, <span class="mono">script.Parent</span> points at the wrong thing.</div></div></div></button>
+      <button class="flip"><div class="flip-inner"><div class="flip-face flip-front"><div class="q">Your join-script says <span class="mono">"Coins"</span> but the coin script says <span class="mono">Coin</span>. What breaks?</div><div class="tap">tap to flip →</div></div><div class="flip-face flip-back"><div class="a">The names do not match, so it cannot find the number. Both must say <span class="mono">Coins</span>, same capital C.</div></div></div></button>
+    </div>
+  </section>
+
+  <!-- TOMORROW -->
+  <section class="card tomorrow">
+    <div class="eyebrow">🔮 Tomorrow · Day 10</div>
+    <div class="lava">🔘</div>
+    <h2>You build a BUTTON</h2>
+    <p>Coins are on the ground. But what about a button right on the screen that the player can tap? Tomorrow you make one. Tap it, and something happens!</p>
+  </section>
+
+  <p class="parent-note">
+    <b>For the parent:</b> today builds straight on Day 7's scoreboard. The win is that he can explain <b>why</b> a coin can only be collected once (because <span class="mono">Destroy()</span> removes it). For the check-in, ask him to add a second number, like "Gems", by copying the Coins pattern on his own. If a coin does nothing, the "Coins did not go up?" box under Step 5 covers the two real causes: the Script in the wrong place, or the name "Coins" not matching between the two scripts. Both are normal and are the actual lesson.
+  </p>
+
+</main>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DAY = 'day9';
+    var steps = document.querySelectorAll('[data-step]');
+    var total = steps.length;
+    var done = 0;
+    var fill = document.getElementById('xpfill');
+    var count = document.getElementById('xpcount');
+    var celebrate = document.getElementById('celebrate');
+    var badge = document.getElementById('badge');
+    var celebTitle = document.getElementById('celebTitle');
+    var celebText = document.getElementById('celebText');
+
+    function loadProgress(){ try { return JSON.parse(localStorage.getItem('rbs_progress') || '{}'); } catch (e) { return {}; } }
+    function saveProgress(p){ try { localStorage.setItem('rbs_progress', JSON.stringify(p)); } catch (e) {} }
+    function recordStep(idx){ var p = loadProgress(); p[DAY] = p[DAY] || { steps: [], done: false }; if (p[DAY].steps.indexOf(idx) === -1) p[DAY].steps.push(idx); if (p[DAY].steps.length >= total) p[DAY].done = true; saveProgress(p); }
+
+    steps.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('done')) return;
+        markDone(btn); recordStep(idx); smallPop(btn);
+        if (done === total) finish(true);
+      });
+    });
+    function markDone(btn){ btn.classList.add('done'); btn.textContent = 'Done!'; done++; fill.style.width = Math.round((done/total)*100) + '%'; count.textContent = done; }
+    (function restore(){ var p = loadProgress(); var saved = (p[DAY] && p[DAY].steps) || []; steps.forEach(function (btn, idx){ if (saved.indexOf(idx) !== -1) markDone(btn); }); if (done === total) finish(false); })();
+
+    function finish(animate){
+      celebrate.classList.remove('locked'); celebrate.classList.add('unlocked');
+      badge.textContent = '🪙';
+      celebTitle.textContent = 'YOU DID IT! Day 9 Coin Collector Badge earned 🎉';
+      celebText.className = '';
+      celebText.textContent = 'You made a real coin that gives points and vanishes when you touch it! You added Coins to your scoreboard, used the touch trick again, found the player, added 1 point, and used Destroy so a coin can only be grabbed once. Then you filled your game with coins by copying. Big Roblox games work exactly like this. You are a coder now. See you on Day 10!';
+      var p = loadProgress(); p[DAY] = p[DAY] || { steps: [] }; p[DAY].done = true; saveProgress(p);
+      if (animate){ celebrate.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); if (!reduce) confettiBurst(); }
+    }
+    function smallPop(el){ if (reduce) return; el.animate([{ transform:'scale(1)' },{ transform:'scale(1.15)' },{ transform:'scale(1)' }], { duration:260, easing:'ease-out' }); }
+
+    document.querySelectorAll('.flip').forEach(function (f){ f.addEventListener('click', function(){ f.classList.toggle('flipped'); }); });
+
+    function confettiBurst(){
+      var cv = document.getElementById('confetti'); var ctx = cv.getContext('2d');
+      var W = cv.width = window.innerWidth, H = cv.height = window.innerHeight;
+      var cols = ['#FF5A47','#2E9BF0','#2FB35C','#FFC531','#8B5CF6']; var bits = [];
+      for (var i=0;i<140;i++){ bits.push({ x:W/2, y:H/3, vx:(Math.random()-0.5)*14, vy:Math.random()*-15-4, s:6+Math.random()*8, c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-0.5)*0.4 }); }
+      var t=0;
+      function frame(){ ctx.clearRect(0,0,W,H); t++; bits.forEach(function(p){ p.vy+=0.4; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); if (t<160) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H); }
+      frame();
+    }
+  })();
+</script>
