@@ -6,7 +6,7 @@ A fun, animated, day-by-day course that turns a young Roblox *player* into a Rob
 
 ## Why this exists
 
-My son loves Roblox. Rather than fight the screen time, I wanted to turn it into time he actually
+My kid loves Roblox. Rather than fight the screen time, I wanted to turn it into time he actually
 learns from: real game-building, real code, real things he ships, one small win at a time.
 
 So we built him his own little school. He opens one page, clicks the day, and builds. Every lesson
@@ -36,7 +36,7 @@ GitHub Pages. Boring and durable on purpose, so it keeps working for years.
 
 ## Credits
 
-Designed and built by **Joel Kanyi** for my son, with **Claude (Anthropic)** as the build partner.
+Designed and built by **Joel Kanyi** for my kid, with **Claude (Anthropic)** as the build partner.
 The day-by-day teaching format is adapted from my own "SpringDay" lesson series. Fundi the weaver
 bird, the lesson scripts, and the animations were shaped together with Claude.
 
