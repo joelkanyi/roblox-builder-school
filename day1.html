@@ -218,6 +218,12 @@
 
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
   :where(button):focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+  .shot { margin:8px 0 16px; border:2px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
+  .shot img { display:block; width:100%; height:auto; }
+  .shot figcaption { font-size:.82rem; color:var(--ink-faint); font-weight:600; padding:9px 14px; text-align:center; }
+  .shot.pending { border-style:dashed; border-color:color-mix(in srgb, var(--sky) 45%, var(--line)); }
+  .shot.pending img { display:none; }
+  .shot.pending::before { content:"\1F4F8  Screenshot goes here: " attr(data-file); display:block; padding:26px 14px; text-align:center; color:var(--ink-faint); font-weight:800; font-size:.85rem; background:var(--sun-soft); }
 </style>
 
 <canvas id="confetti"></canvas>
@@ -376,6 +382,11 @@
     <div class="step-num"><span class="n">5</span><span class="lab">Your first block</span></div>
     <h2>Drop your very first block 🧱</h2>
     <p>Big moment. In Roblox, almost everything is made from <b>Parts</b>. A Part is one block, like one brick in a wall. Big things like castles and cars are just many blocks put together. At the top of Studio, in the Home tab, find the <b>Part</b> button. Click it. A grey block appears! A new name, Part, also shows up in the Explorer.</p>
+    <figure class="shot" data-file="images/day1-part-button.png">
+      <img src="images/day1-part-button.png" alt="The Part button in the Home tab of Roblox Studio" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: the Part button is in the Home tab at the top.</figcaption>
+    </figure>
+
     <div class="stage">
       <div class="dropzone">
         <div class="dblock"></div>
@@ -404,6 +415,11 @@
     <div class="step-num"><span class="n">6</span><span class="lab">Move it like a pro</span></div>
     <h2>Move it the pro way</h2>
     <p>There is a neat way to move a block: the <b>Move tool</b>. When it is on, three arrows appear on your block: red, green, and blue. Each arrow moves the block in one straight line only (green is up and down). This helps you put the block in the exact spot you want.</p>
+    <figure class="shot" data-file="images/day1-move-tool.png">
+      <img src="images/day1-move-tool.png" alt="A selected block with the red green blue Move arrows" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: click the block (blue outline), then Home tab, then Move. The arrows appear.</figcaption>
+    </figure>
+
     <div class="stage">
       <div class="movecube"><div class="arrow-stem"></div><div class="arrow-up"></div></div>
     </div>

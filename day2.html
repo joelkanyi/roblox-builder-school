@@ -158,6 +158,12 @@
 
   #confetti { position:fixed; inset:0; pointer-events:none; z-index:100; }
   :where(a,button,summary):focus-visible { outline:3px solid var(--sky); outline-offset:3px; }
+  .shot { margin:8px 0 16px; border:2px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
+  .shot img { display:block; width:100%; height:auto; }
+  .shot figcaption { font-size:.82rem; color:var(--ink-faint); font-weight:600; padding:9px 14px; text-align:center; }
+  .shot.pending { border-style:dashed; border-color:color-mix(in srgb, var(--sky) 45%, var(--line)); }
+  .shot.pending img { display:none; }
+  .shot.pending::before { content:"\1F4F8  Screenshot goes here: " attr(data-file); display:block; padding:26px 14px; text-align:center; color:var(--ink-faint); font-weight:800; font-size:.85rem; background:var(--sun-soft); }
 </style>
 
 <canvas id="confetti"></canvas>
@@ -204,6 +210,11 @@
     <div class="step-num"><span class="n">1</span><span class="lab">Meet the Script</span></div>
     <h2>The Script: where your code lives</h2>
     <p>A <b>Script</b> is where you write code. Think of a note you put in someone's pocket. The person with the note follows it. In Roblox you put the note <b>inside</b> a block. Then that block follows it. Things in Roblox can hold other things inside them, like a bag holds books.</p>
+    <figure class="shot" data-file="images/day2-script-in-part.png">
+      <img src="images/day2-script-in-part.png" alt="Explorer panel showing a Script inside a Part" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: the Script sits INSIDE the Part in the Explorer.</figcaption>
+    </figure>
+
     <div class="stage">
       <div class="treecmp">
         <div class="treebox good">
@@ -242,6 +253,11 @@
     <p>When your Script opens, delete everything in it first. Then type this, exactly like this:</p>
     <div class="code"><div class="bar"><i style="background:#FF5A47"></i><i style="background:#FFC531"></i><i style="background:#2FB35C"></i></div><pre><span class="fn">print</span>(<span class="str">"hello"</span>)</pre></div>
     <p><b>print</b> does not use a printer! It makes the computer write a message in a window called the <b>Output</b>. Open it from the View tab. This is how the computer talks back to you.</p>
+    <figure class="shot" data-file="images/day2-output.png">
+      <img src="images/day2-output.png" alt="The Output window showing the word hello" loading="lazy" onerror="this.closest('.shot').classList.add('pending')">
+      <figcaption>Real Studio: the Output window shows your message.</figcaption>
+    </figure>
+
     <div class="yourturn">
       <div class="txt"><span class="kick">Your turn</span>
         <ol>
